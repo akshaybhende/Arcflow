@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { MOCK_USERS } from '../../mock/mock-data';
@@ -23,11 +23,10 @@ export interface NavItem {
 export class Sidebar {
   private readonly store = inject(Store);
 
-  readonly navigate = output<void>();
+  @Output() readonly navigate = new EventEmitter<void>();
 
-  readonly collapsed$ = this.store.select(selectSidebarCollapsed);
+  readonly collapsed$: Observable<boolean>;
   readonly currentUser = MOCK_USERS[0];
-
   readonly trackByRoute = trackByRoute;
 
   readonly navItems: NavItem[] = [
@@ -38,6 +37,10 @@ export class Sidebar {
     { label: 'Activities', icon: 'event_note', route: '/activities' },
     { label: 'Settings', icon: 'settings', route: '/settings' },
   ];
+
+  constructor() {
+    this.collapsed$ = this.store.select(selectSidebarCollapsed);
+  }
 
   onToggleCollapse(): void {
     this.store.dispatch(toggleSidebar());

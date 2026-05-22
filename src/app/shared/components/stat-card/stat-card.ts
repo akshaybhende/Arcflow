@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostBinding, Input } from '@angular/core';
 
 export type StatCardTrendDirection = 'up' | 'down' | 'neutral';
 
@@ -16,4 +16,9 @@ export class StatCard {
   @Input() iconColor = 'var(--color-primary)';
   @Input() trend?: string;
   @Input() trendDirection: StatCardTrendDirection = 'neutral';
+
+  @HostBinding('style.--icon-color')
+  get iconColorVar(): string {
+    return this.iconColor;
+  }
 }

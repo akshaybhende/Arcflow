@@ -2,7 +2,7 @@
   <mat-sidenav
     class="app-layout__sidenav"
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
-    [opened]="(isHandset$ | async) ? (mobileSidebarOpen$ | async) : true"
+    [opened]="((isHandset$ | async) ?? false) ? ((mobileSidebarOpen$ | async) ?? false) : true"
     (closedStart)="onSidenavClosed()"
   >
     <app-sidebar (navigate)="onSidebarNavigate()"></app-sidebar>

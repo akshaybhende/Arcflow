@@ -1,4 +1,4 @@
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -24,6 +24,7 @@ import { DealsEffects } from './store/deals/deals.effects';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    HttpClientModule,
     MatSnackBarModule,
     AppRoutingModule,
     LayoutModule,
@@ -41,7 +42,7 @@ import { DealsEffects } from './store/deals/deals.effects';
       passThruUnknownUrl: true,
     }),
   ],
-  providers: [provideBrowserGlobalErrorListeners(), provideHttpClient(withInterceptorsFromDi())],
+  providers: [provideBrowserGlobalErrorListeners()],
   bootstrap: [App],
 })
 export class AppModule {}

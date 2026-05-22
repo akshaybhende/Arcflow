@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
@@ -24,6 +24,10 @@ import {
 
 @Injectable()
 export class CompaniesEffects {
+  private readonly actions$ = inject(Actions);
+  private readonly companiesService = inject(CompaniesService);
+  private readonly notificationService = inject(NotificationService);
+
   loadCompanies$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadCompanies),
@@ -129,10 +133,4 @@ export class CompaniesEffects {
       ),
     { dispatch: false },
   );
-
-  constructor(
-    private readonly actions$: Actions,
-    private readonly companiesService: CompaniesService,
-    private readonly notificationService: NotificationService,
-  ) {}
 }

@@ -9,6 +9,11 @@ const routes: Routes = [
     loadChildren: () => import('./features/auth/auth.module').then((m) => m.AuthModule),
   },
   {
+    path: 'auth',
+    redirectTo: 'login',
+    pathMatch: 'full',
+  },
+  {
     path: '',
     component: MainLayout,
     canActivate: [AuthGuard],
