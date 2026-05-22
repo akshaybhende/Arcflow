@@ -70,7 +70,7 @@
       actionLabel="Add Contact"
       (action)="onAddContact()"
     ></app-empty-state>
-  } @else if (viewMode === 'table') {
+  } @else if (effectiveViewMode(isHandset$ | async) === 'table') {
     <div class="contacts-list__table-wrap surface rounded-lg border">
       <table
         mat-table
@@ -154,10 +154,12 @@
                 <mat-icon>edit</mat-icon>
                 Edit
               </button>
-              <button mat-menu-item type="button" (click)="onDelete(contact)">
-                <mat-icon color="warn">delete</mat-icon>
-                Delete
-              </button>
+              <ng-container *appHasRole="['admin', 'manager']">
+                <button mat-menu-item type="button" (click)="onDelete(contact)">
+                  <mat-icon color="warn">delete</mat-icon>
+                  Delete
+                </button>
+              </ng-container>
             </mat-menu>
           </td>
         </ng-container>
@@ -186,7 +188,7 @@
     </div>
   } @else {
     <div class="contacts-list__cards">
-      @for (contact of contacts$ | async; track contact.id) {
+      @for (contact of contacts$ | async; track trackById($index, contact)) {
         <mat-card class="contacts-list__card" (click)="onView(contact)">
           <mat-card-content>
             <div class="contacts-list__card-header">

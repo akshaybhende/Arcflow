@@ -18,6 +18,7 @@ import {
   selectFilteredActivities,
   selectSelectedActivity,
 } from '../../../store/activities/activities.selectors';
+import { trackById } from '../../../shared/utils/track-by';
 import { ACTIVITY_TYPE_META } from '../activity.utils';
 import { LogActivityDialog, LogActivityDialogData } from '../log-activity-dialog/log-activity-dialog';
 
@@ -34,6 +35,7 @@ export class ActivitiesList implements OnInit {
   private readonly fb = inject(FormBuilder);
 
   readonly typeMeta = ACTIVITY_TYPE_META;
+  readonly trackById = trackById;
   readonly typeOptions: { value: ActivityType | 'all'; label: string }[] = [
     { value: 'all', label: 'All Types' },
     { value: 'call', label: 'Call' },

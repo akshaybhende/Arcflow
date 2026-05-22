@@ -124,7 +124,13 @@ export class ContactsEffects {
   mutationFailure$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(createContactFailure, updateContactFailure, deleteContactFailure, loadContactsFailure),
+        ofType(
+          createContactFailure,
+          updateContactFailure,
+          deleteContactFailure,
+          loadContactsFailure,
+          loadContactFailure,
+        ),
         tap(({ error }) => this.notificationService.error(error)),
       ),
     { dispatch: false },

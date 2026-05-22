@@ -1,9 +1,17 @@
-<div class="app-layout" [class.sidebar-collapsed]="sidebarCollapsed$ | async">
-  <app-sidebar></app-sidebar>
-  <div class="main-content">
-    <app-topbar></app-topbar>
+<mat-sidenav-container class="app-layout" autosize>
+  <mat-sidenav
+    class="app-layout__sidenav"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) ? (mobileSidebarOpen$ | async) : true"
+    (closedStart)="onSidenavClosed()"
+  >
+    <app-sidebar (navigate)="onSidebarNavigate()"></app-sidebar>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="app-layout__content">
+    <app-topbar [showMenu]="(isHandset$ | async) ?? false" (menuToggle)="onMenuToggle()"></app-topbar>
     <main class="page-content">
       <router-outlet></router-outlet>
     </main>
-  </div>
-</div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

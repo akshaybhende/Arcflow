@@ -13,6 +13,7 @@ import { ConfirmDialog } from './components/confirm-dialog/confirm-dialog';
 import { Avatar } from './components/avatar/avatar';
 import { LoadingSpinner } from './components/loading-spinner/loading-spinner';
 import { ClickOutsideDirective } from './directives/click-outside.directive';
+import { HasRoleDirective } from './directives/has-role.directive';
 import { InitialsPipe } from './pipes/initials.pipe';
 import { TimeAgoPipe } from './pipes/time-ago.pipe';
 import { CurrencyFormatPipe } from './pipes/currency-format.pipe';
@@ -25,6 +26,7 @@ const SHARED_DECLARATIONS = [
   Avatar,
   LoadingSpinner,
   ClickOutsideDirective,
+  HasRoleDirective,
   InitialsPipe,
   TimeAgoPipe,
   CurrencyFormatPipe,

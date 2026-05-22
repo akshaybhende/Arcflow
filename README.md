@@ -28,6 +28,8 @@ A production-grade Enterprise CRM built with **Angular 21**, **NgRx**, and **Ang
 ## Getting started
 
 ```bash
+git clone https://github.com/yourusername/arcflow.git
+cd arcflow
 npm install
 npm start
 ```

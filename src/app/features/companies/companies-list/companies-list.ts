@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { Company, CompanyIndustry, CompanySize } from '../../../core/models';
 import { loadCompanies, setCompaniesFilter } from '../../../store/companies/companies.actions';
 import {
@@ -23,9 +25,17 @@ type ViewMode = 'table' | 'cards';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CompaniesList implements OnInit {
+  private static readonly HANDSET_QUERY = '(max-width: 768px)';
+
   private readonly store = inject(Store);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly breakpointObserver = inject(BreakpointObserver);
+  private readonly destroyRef = inject(DestroyRef);
+
+  readonly isHandset$ = this.breakpointObserver
+    .observe(CompaniesList.HANDSET_QUERY)
+    .pipe(map((state) => state.matches));
 
   readonly industryLabels = INDUSTRY_LABELS;
   readonly sizeLabels = SIZE_LABELS;
@@ -63,10 +73,21 @@ export class CompaniesList implements OnInit {
     this.industryFilter.valueChanges.subscribe(() => this.applyFilters());
     this.sizeFilter.valueChanges.subscribe(() => this.applyFilters());
 
-    this.companies$.subscribe((companies) => {
+    this.companies$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((companies) => {
       this.dataSource.data = companies;
       this.cdr.markForCheck();
     });
+
+    this.isHandset$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((handset) => {
+      if (handset) {
+        this.viewMode = 'cards';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  effectiveViewMode(handset: boolean | null): ViewMode {
+    return handset ? 'cards' : this.viewMode;
   }
 
   setViewMode(mode: ViewMode): void {

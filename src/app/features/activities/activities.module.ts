@@ -1,3 +1,4 @@
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -14,18 +15,20 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 import { SharedModule } from '../../shared/shared.module';
+import { ActivitiesDialogModule } from './activities-dialog.module';
 import { ActivitiesRoutingModule } from './activities-routing.module';
 import { ActivitiesList } from './activities-list/activities-list';
-import { LogActivityDialog } from './log-activity-dialog/log-activity-dialog';
 
 @NgModule({
-  declarations: [ActivitiesList, LogActivityDialog],
+  declarations: [ActivitiesList],
   imports: [
     CommonModule,
+    ScrollingModule,
     RouterModule,
     ReactiveFormsModule,
     SharedModule,
     ActivitiesRoutingModule,
+    ActivitiesDialogModule,
     MatButtonModule,
     MatDialogModule,
     MatFormFieldModule,

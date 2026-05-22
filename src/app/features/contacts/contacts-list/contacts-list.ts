@@ -1,5 +1,7 @@
+import { BreakpointObserver } from '@angular/cdk/layout';
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   OnInit,
@@ -12,6 +14,7 @@ import { Sort } from '@angular/material/sort';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { debounceTime, distinctUntilChanged, take } from 'rxjs/operators';
 
 import { Contact, ContactStatus, LeadSource } from '../../../core/models';
@@ -42,6 +45,7 @@ import {
   LEAD_SOURCE_OPTIONS,
   contactStatusClass,
 } from '../contact-status.util';
+import { trackById } from '../../../shared/utils/track-by';
 
 type ViewMode = 'table' | 'cards';
 
@@ -61,11 +65,18 @@ const SORT_COLUMN_MAP: Record<string, ContactsSortField> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactsList implements OnInit {
+  private static readonly HANDSET_QUERY = '(max-width: 768px)';
   private readonly store = inject(Store);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly breakpointObserver = inject(BreakpointObserver);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly searchInput$ = new Subject<string>();
+
+  readonly isHandset$ = this.breakpointObserver
+    .observe(ContactsList.HANDSET_QUERY)
+    .pipe(map((state) => state.matches));
 
   readonly contacts$ = this.store.select(selectPaginatedContacts);
   readonly totalCount$ = this.store.select(selectContactsTotalCount);
@@ -78,6 +89,7 @@ export class ContactsList implements OnInit {
   readonly statusLabels = CONTACT_STATUS_LABELS;
   readonly leadSourceLabels = LEAD_SOURCE_LABELS;
   readonly contactStatusClass = contactStatusClass;
+  readonly trackById = trackById;
 
   viewMode: ViewMode = 'table';
   searchValue = '';
@@ -108,6 +120,16 @@ export class ContactsList implements OnInit {
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe((search) => this.patchFilter({ search: search || undefined }));
 
+    this.isHandset$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((handset) => {
+      if (handset) {
+        this.viewMode = 'cards';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  effectiveViewMode(handset: boolean | null): ViewMode {
+    return handset ? 'cards' : this.viewMode;
   }
 
   onSearchInput(value: string): void {

@@ -16,6 +16,9 @@ import {
 
 export interface LogActivityDialogData {
   activity?: Activity;
+  contactId?: string;
+  contactName?: string;
+  dealId?: string;
 }
 
 @Component({
@@ -75,9 +78,26 @@ export class LogActivityDialog implements OnInit {
       this.cdr.markForCheck();
     });
 
+    if (this.data.contactId && !this.data.activity) {
+      this.form.patchValue({
+        contactId: this.data.contactId,
+        contactSearch: this.data.contactName ?? '',
+      });
+    }
+
     this.dealsService.getAll().subscribe((deals) => {
       this.deals = deals;
-      this.filterDealsByContact(this.form.controls.contactId.value);
+      const contactId = this.form.controls.contactId.value ?? this.data.contactId ?? null;
+      this.filterDealsByContact(contactId);
+      if (this.data.dealId && !this.data.activity) {
+        const deal = deals.find((d) => d.id === this.data.dealId);
+        if (deal) {
+          this.form.patchValue({
+            dealId: deal.id,
+            dealSearch: deal.title,
+          });
+        }
+      }
       this.cdr.markForCheck();
     });
 

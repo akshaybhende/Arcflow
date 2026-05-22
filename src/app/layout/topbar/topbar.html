@@ -4,6 +4,17 @@
   }
 
   <div class="topbar__inner">
+    @if (showMenu()) {
+      <button
+        mat-icon-button
+        type="button"
+        class="topbar__menu"
+        (click)="onMenuClick()"
+        aria-label="Open navigation menu"
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+    }
     <h2 class="topbar__title">{{ pageTitle$ | async }}</h2>
 
     <div class="topbar__search">
@@ -30,7 +41,7 @@
       <button mat-icon-button type="button" aria-label="Notifications">
         <mat-icon
           [matBadge]="(unreadCount$ | async) || null"
-          [matBadgeHidden]="!(unreadCount$ | async)"
+          [matBadgeHidden]="((unreadCount$ | async) ?? 0) === 0"
           matBadgeColor="warn"
           matBadgeSize="small"
         >

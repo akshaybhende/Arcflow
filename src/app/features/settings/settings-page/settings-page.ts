@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
+import { AuthService } from '../../../core/services/auth.service';
 
 export type SettingsTab = 'profile' | 'appearance' | 'notifications' | 'team' | 'about';
 
@@ -17,8 +18,9 @@ export interface SettingsNavItem {
 })
 export class SettingsPage {
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly authService = inject(AuthService);
 
-  readonly navItems: SettingsNavItem[] = [
+  private readonly allNavItems: SettingsNavItem[] = [
     { id: 'profile', label: 'Profile', icon: 'person' },
     { id: 'appearance', label: 'Appearance', icon: 'palette' },
     { id: 'notifications', label: 'Notifications', icon: 'notifications' },
@@ -26,9 +28,19 @@ export class SettingsPage {
     { id: 'about', label: 'About', icon: 'info' },
   ];
 
+  get navItems(): SettingsNavItem[] {
+    if (this.authService.currentUser?.role === 'sales-rep') {
+      return this.allNavItems.filter((item) => item.id !== 'team');
+    }
+    return this.allNavItems;
+  }
+
   activeTab: SettingsTab = 'profile';
 
   selectTab(tab: SettingsTab): void {
+    if (!this.navItems.some((item) => item.id === tab)) {
+      return;
+    }
     this.activeTab = tab;
     this.cdr.markForCheck();
   }

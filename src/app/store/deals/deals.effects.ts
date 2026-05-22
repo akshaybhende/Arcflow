@@ -114,7 +114,13 @@ export class DealsEffects {
   mutationFailure$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(createDealFailure, updateDealFailure, deleteDealFailure, loadDealsFailure),
+        ofType(
+          createDealFailure,
+          updateDealFailure,
+          deleteDealFailure,
+          loadDealsFailure,
+          loadDealFailure,
+        ),
         tap(({ error }) => this.notificationService.error(error)),
       ),
     { dispatch: false },

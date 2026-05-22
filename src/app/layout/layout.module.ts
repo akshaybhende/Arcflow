@@ -9,6 +9,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 import { SharedModule } from '../shared/shared.module';
 import { MainLayout } from './main-layout/main-layout';
@@ -30,6 +31,7 @@ import { LayoutPlaceholder } from './layout-placeholder/layout-placeholder';
     MatBadgeModule,
     MatProgressBarModule,
     MatDividerModule,
+    MatSidenavModule,
   ],
   exports: [MainLayout, Sidebar, Topbar],
 })

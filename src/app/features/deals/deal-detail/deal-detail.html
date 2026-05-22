@@ -38,7 +38,9 @@
 
         <div class="deal-detail__actions">
           <button mat-stroked-button type="button" (click)="navigateToEdit()">Edit</button>
-          <button mat-stroked-button color="warn" type="button" (click)="confirmDelete()">Delete</button>
+          <ng-container *appHasRole="['admin', 'manager']">
+            <button mat-stroked-button color="warn" type="button" (click)="confirmDelete()">Delete</button>
+          </ng-container>
         </div>
       </aside>
 

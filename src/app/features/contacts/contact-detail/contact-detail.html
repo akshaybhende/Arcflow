@@ -94,10 +94,12 @@
           <mat-icon>edit</mat-icon>
           Edit
         </button>
-        <button mat-stroked-button color="warn" type="button" (click)="onDelete(contact)">
-          <mat-icon>delete</mat-icon>
-          Delete
-        </button>
+        <ng-container *appHasRole="['admin', 'manager']">
+          <button mat-stroked-button color="warn" type="button" (click)="onDelete(contact)">
+            <mat-icon>delete</mat-icon>
+            Delete
+          </button>
+        </ng-container>
       </div>
     </div>
 
@@ -154,7 +156,7 @@
           <div class="contact-detail__tab-content">
             <div class="contact-detail__tab-toolbar">
               <h3>Deals</h3>
-              <button mat-stroked-button type="button" (click)="onAddDeal()">
+              <button mat-stroked-button type="button" (click)="onAddDeal(contact)">
                 <mat-icon>add</mat-icon>
                 Add Deal
               </button>
@@ -186,7 +188,7 @@
           <div class="contact-detail__tab-content">
             <div class="contact-detail__tab-toolbar">
               <h3>Activity timeline</h3>
-              <button mat-stroked-button type="button" (click)="onLogActivity()">
+              <button mat-stroked-button type="button" (click)="onLogActivity(contact)">
                 <mat-icon>add</mat-icon>
                 Log Activity
               </button>

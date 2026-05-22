@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { MOCK_USERS } from '../../mock/mock-data';
+import { trackByRoute } from '../../shared/utils/track-by';
 import { toggleSidebar } from '../../store/ui/ui.actions';
 import { selectSidebarCollapsed } from '../../store/ui/ui.selectors';
 
@@ -22,8 +23,12 @@ export interface NavItem {
 export class Sidebar {
   private readonly store = inject(Store);
 
+  readonly navigate = output<void>();
+
   readonly collapsed$ = this.store.select(selectSidebarCollapsed);
   readonly currentUser = MOCK_USERS[0];
+
+  readonly trackByRoute = trackByRoute;
 
   readonly navItems: NavItem[] = [
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
@@ -36,5 +41,9 @@ export class Sidebar {
 
   onToggleCollapse(): void {
     this.store.dispatch(toggleSidebar());
+  }
+
+  onNavClick(): void {
+    this.navigate.emit();
   }
 }

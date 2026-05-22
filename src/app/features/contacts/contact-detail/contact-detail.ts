@@ -19,6 +19,10 @@ import {
   ConfirmDialog,
   ConfirmDialogData,
 } from '../../../shared/components/confirm-dialog/confirm-dialog';
+import {
+  LogActivityDialog,
+  LogActivityDialogData,
+} from '../../activities/log-activity-dialog/log-activity-dialog';
 import { loadActivities } from '../../../store/activities/activities.actions';
 import { selectAllActivities } from '../../../store/activities/activities.selectors';
 import { loadCompanies } from '../../../store/companies/companies.actions';
@@ -172,12 +176,33 @@ export class ContactDetail implements OnInit {
     });
   }
 
-  onAddDeal(): void {
-    this.notification.info('Create deal dialog coming soon');
+  onAddDeal(contact: Contact): void {
+    void this.router.navigate(['/deals/new'], {
+      queryParams: {
+        contactId: contact.id,
+        contactName: this.fullName(contact),
+        companyName: contact.companyName ?? '',
+      },
+    });
   }
 
-  onLogActivity(): void {
-    this.notification.info('Log activity dialog coming soon');
+  onLogActivity(contact: Contact): void {
+    const ref = this.dialog.open<LogActivityDialog, LogActivityDialogData, boolean>(
+      LogActivityDialog,
+      {
+        width: '520px',
+        data: {
+          contactId: contact.id,
+          contactName: this.fullName(contact),
+        },
+      },
+    );
+
+    ref.afterClosed().pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe((saved) => {
+      if (saved) {
+        this.store.dispatch(loadActivities());
+      }
+    });
   }
 
   onUploadFile(): void {

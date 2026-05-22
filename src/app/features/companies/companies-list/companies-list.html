@@ -55,7 +55,7 @@
 
   @if (loading$ | async) {
     <app-loading-spinner />
-  } @else if (viewMode === 'table') {
+  } @else if (effectiveViewMode(isHandset$ | async) === 'table') {
     <div class="companies-list__table-wrap">
       <table mat-table [dataSource]="dataSource" class="companies-list__table">
         <ng-container matColumnDef="name">

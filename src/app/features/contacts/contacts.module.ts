@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -21,6 +22,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { SharedModule } from '../../shared/shared.module';
+import { ActivitiesDialogModule } from '../activities/activities-dialog.module';
 import { ContactsRoutingModule } from './contacts-routing.module';
 import { ContactsList } from './contacts-list/contacts-list';
 import { ContactDetail } from './contact-detail/contact-detail';
@@ -32,9 +34,11 @@ import { ContactForm } from './contact-form/contact-form';
     CommonModule,
     ReactiveFormsModule,
     SharedModule,
+    ActivitiesDialogModule,
     ContactsRoutingModule,
     MatAutocompleteModule,
     MatButtonModule,
+    MatDialogModule,
     MatButtonToggleModule,
     MatCardModule,
     MatChipsModule,

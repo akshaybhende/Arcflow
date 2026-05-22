@@ -55,9 +55,10 @@
               (action)="openLogDialog()"
             ></app-empty-state>
           } @else {
-            <ul class="activities-list__rows">
-              @for (activity of vm.activities; track activity.id) {
+            <cdk-virtual-scroll-viewport itemSize="88" class="activities-list__viewport">
+              <ul class="activities-list__rows">
                 <li
+                  *cdkVirtualFor="let activity of vm.activities; trackBy: trackById"
                   class="activities-list__row"
                   [class.activities-list__row--selected]="isSelected(activity, vm.selected)"
                   (click)="selectActivity(activity)"
@@ -113,8 +114,8 @@
                     </button>
                   }
                 </li>
-              }
-            </ul>
+              </ul>
+            </cdk-virtual-scroll-viewport>
           }
         </div>
 
@@ -186,10 +187,12 @@
                   <mat-icon>edit</mat-icon>
                   Edit
                 </button>
-                <button mat-stroked-button color="warn" type="button" (click)="deleteActivity(selected)">
-                  <mat-icon>delete</mat-icon>
-                  Delete
-                </button>
+                <ng-container *appHasRole="['admin', 'manager']">
+                  <button mat-stroked-button color="warn" type="button" (click)="deleteActivity(selected)">
+                    <mat-icon>delete</mat-icon>
+                    Delete
+                  </button>
+                </ng-container>
               </div>
             </div>
           } @else {

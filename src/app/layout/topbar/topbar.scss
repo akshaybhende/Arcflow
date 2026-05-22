@@ -83,6 +83,10 @@
   color: var(--color-text-primary);
 }
 
+.topbar__menu {
+  flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
   .topbar__title {
     display: none;

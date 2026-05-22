@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { filter, map, startWith } from 'rxjs/operators';
@@ -32,6 +32,9 @@ export class Topbar {
   private readonly themeService = inject(ThemeService);
   private readonly authService = inject(AuthService);
 
+  readonly showMenu = input(false);
+  readonly menuToggle = output<void>();
+
   readonly currentUser$ = this.authService.getCurrentUser();
   readonly globalLoading$ = this.store.select(selectGlobalLoading);
   readonly theme$ = this.store.select(selectTheme);
@@ -44,6 +47,10 @@ export class Topbar {
     map(() => this.resolvePageTitle()),
     startWith(this.resolvePageTitle()),
   );
+
+  onMenuClick(): void {
+    this.menuToggle.emit();
+  }
 
   onToggleTheme(): void {
     this.themeService.toggleTheme();
