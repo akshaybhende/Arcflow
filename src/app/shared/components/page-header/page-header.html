@@ -1,21 +1,21 @@
 @if (breadcrumbs?.length) {
-  <nav class="page-header__breadcrumbs" aria-label="Breadcrumb">
+  <nav class="flex items-center flex-wrap gap-1 mb-3 text-sm" aria-label="Breadcrumb">
     @for (crumb of breadcrumbs; track crumb.label; let last = $last) {
       @if (!last && crumb.route) {
-        <a [routerLink]="crumb.route" class="page-header__crumb">{{ crumb.label }}</a>
+        <a [routerLink]="crumb.route" class="text-muted-foreground hover:text-foreground no-underline">{{ crumb.label }}</a>
       } @else {
-        <span class="page-header__crumb" [class.page-header__crumb--current]="last">{{ crumb.label }}</span>
+        <span [class]="last ? 'text-foreground font-medium' : 'text-muted-foreground'">{{ crumb.label }}</span>
       }
       @if (!last) {
-        <mat-icon class="page-header__separator" aria-hidden="true">chevron_right</mat-icon>
+        <span class="material-icons-round text-base text-muted-foreground" aria-hidden="true">chevron_right</span>
       }
     }
   </nav>
 }
 
-<div class="page-header__content">
-  <h1 class="page-header__title">{{ title }}</h1>
+<div>
+  <h1 class="text-3xl font-semibold leading-tight m-0">{{ title }}</h1>
   @if (subtitle) {
-    <p class="page-header__subtitle">{{ subtitle }}</p>
+    <p class="mt-2 text-muted-foreground text-base m-0">{{ subtitle }}</p>
   }
 </div>

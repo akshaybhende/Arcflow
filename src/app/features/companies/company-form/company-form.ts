@@ -31,6 +31,7 @@ export class CompanyForm implements OnInit, OnDestroy {
   companyId: string | null = null;
   saving = false;
   submitted = false;
+  addressExpanded = false;
 
   form = this.fb.nonNullable.group({
     name: ['', Validators.required],

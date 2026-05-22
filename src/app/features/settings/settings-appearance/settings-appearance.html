@@ -1,39 +1,66 @@
-<section class="settings-section">
-  <h2 class="settings-section__title">Appearance</h2>
-  <p class="settings-section__desc">Customize how Arcflow looks on your device.</p>
+<section class="rounded-lg border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-6">
+  <div>
+    <h2 class="text-base font-semibold text-foreground">Appearance</h2>
+    <p class="text-sm text-muted-foreground mt-1">Customize how Arcflow looks on your device.</p>
+  </div>
 
-  <div class="settings-appearance__group">
-    <h3 class="settings-appearance__label">Theme</h3>
-    <div class="settings-appearance__theme-cards">
+  <div class="h-px bg-border"></div>
+
+  <!-- Theme selection -->
+  <div class="flex flex-col gap-3">
+    <h3 class="text-sm font-medium text-foreground">Theme</h3>
+    <div class="flex flex-wrap gap-3">
       @for (opt of themeOptions; track opt.value) {
         <button
           type="button"
-          class="settings-appearance__theme-card"
-          [class.settings-appearance__theme-card--active]="themePreference === opt.value"
+          class="flex flex-col items-center gap-2 rounded-lg border-2 px-6 py-4 text-sm font-medium transition-all"
+          [class]="themePreference === opt.value
+            ? 'border-primary bg-primary/5 text-primary'
+            : 'border-border bg-background text-muted-foreground hover:border-accent hover:text-foreground'"
           (click)="selectTheme(opt.value)"
         >
-          <mat-icon>{{ opt.icon }}</mat-icon>
+          <span class="material-icons-round text-2xl">{{ opt.icon }}</span>
           <span>{{ opt.label }}</span>
+          @if (themePreference === opt.value) {
+            <span class="material-icons-round text-base text-primary">check_circle</span>
+          }
         </button>
       }
     </div>
   </div>
 
-  <div class="settings-appearance__group">
-    <h3 class="settings-appearance__label">Accent color</h3>
-    <div class="settings-appearance__swatches">
+  <div class="h-px bg-border"></div>
+
+  <!-- Accent color -->
+  <div class="flex flex-col gap-3">
+    <h3 class="text-sm font-medium text-foreground">Accent color</h3>
+    <div class="flex flex-wrap gap-3">
       @for (accent of accentOptions; track accent.id) {
         <button
           type="button"
-          class="settings-appearance__swatch"
-          [class.settings-appearance__swatch--active]="accentColor === accent.id"
+          class="relative h-9 w-9 rounded-full border-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
           [style.background-color]="accent.primary"
+          [class]="accentColor === accent.id ? 'border-foreground scale-110' : 'border-transparent hover:scale-105'"
           [attr.aria-label]="accent.label"
           (click)="selectAccent(accent.id)"
-        ></button>
+        >
+          @if (accentColor === accent.id) {
+            <span class="absolute inset-0 flex items-center justify-center">
+              <span class="material-icons-round text-white text-base">check</span>
+            </span>
+          }
+        </button>
       }
     </div>
   </div>
 
-  <button mat-flat-button color="primary" type="button" (click)="onSave()">Save</button>
+  <div class="h-px bg-border"></div>
+
+  <div>
+    <button
+      type="button"
+      class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+      (click)="onSave()"
+    >Save</button>
+  </div>
 </section>

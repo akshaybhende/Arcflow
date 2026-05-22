@@ -1,10 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { PageHeader } from './components/page-header/page-header';
 import { StatCard } from './components/stat-card/stat-card';
@@ -37,11 +34,8 @@ const SHARED_DECLARATIONS = [
   imports: [
     CommonModule,
     RouterModule,
-    MatButtonModule,
     MatDialogModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
   ],
-  exports: [...SHARED_DECLARATIONS, MatButtonModule, MatDialogModule, MatIconModule, MatProgressSpinnerModule],
+  exports: [...SHARED_DECLARATIONS, MatDialogModule],
 })
 export class SharedModule {}

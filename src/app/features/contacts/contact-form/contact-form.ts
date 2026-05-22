@@ -11,8 +11,6 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { MatChipInputEvent } from '@angular/material/chips';
 import { combineLatest, map, startWith, take } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
@@ -50,7 +48,6 @@ export class ContactForm implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly separatorKeysCodes = [ENTER, COMMA] as const;
   readonly statusLabels = CONTACT_STATUS_LABELS;
   readonly leadSourceLabels = LEAD_SOURCE_LABELS;
 
@@ -76,6 +73,10 @@ export class ContactForm implements OnInit {
   submitted = false;
   saving = false;
   tags: string[] = [];
+  addressExpanded = false;
+  socialExpanded = false;
+  tagInput = '';
+  companyInput = '';
 
   readonly form = this.fb.nonNullable.group({
     firstName: ['', Validators.required],
@@ -182,6 +183,10 @@ export class ContactForm implements OnInit {
     return typeof company === 'string' ? company : company.name;
   }
 
+  onCompanyInputChange(value: string): void {
+    this.companyInput = value;
+  }
+
   onCompanySelected(company: Company): void {
     this.form.patchValue({
       companyId: company.id,
@@ -189,12 +194,11 @@ export class ContactForm implements OnInit {
     });
   }
 
-  addTag(event: MatChipInputEvent): void {
-    const value = (event.value ?? '').trim();
-    if (value && !this.tags.includes(value)) {
-      this.tags = [...this.tags, value];
+  addTagFromInput(value: string): void {
+    const trimmed = (value ?? '').trim();
+    if (trimmed && !this.tags.includes(trimmed)) {
+      this.tags = [...this.tags, trimmed];
     }
-    event.chipInput?.clear();
   }
 
   removeTag(tag: string): void {

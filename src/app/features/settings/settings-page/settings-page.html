@@ -1,21 +1,27 @@
-<app-page-header title="Settings" subtitle="Account and application preferences"></app-page-header>
+<div class="mb-6">
+  <app-page-header title="Settings" subtitle="Account and application preferences"></app-page-header>
+</div>
 
-<div class="settings-page">
-  <nav class="settings-page__nav" aria-label="Settings sections">
+<div class="flex flex-col lg:flex-row gap-6">
+  <!-- Sidebar nav -->
+  <nav class="flex flex-row lg:flex-col gap-1 lg:w-52 flex-shrink-0 overflow-x-auto lg:overflow-visible" aria-label="Settings sections">
     @for (item of navItems; track item.id) {
       <button
         type="button"
-        class="settings-page__nav-item"
-        [class.settings-page__nav-item--active]="activeTab === item.id"
+        class="flex items-center gap-2.5 whitespace-nowrap rounded-md px-3 py-2.5 text-sm font-medium transition-colors"
+        [class]="activeTab === item.id
+          ? 'bg-primary text-primary-foreground'
+          : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
         (click)="selectTab(item.id)"
       >
-        <mat-icon>{{ item.icon }}</mat-icon>
+        <span class="material-icons-round text-base">{{ item.icon }}</span>
         {{ item.label }}
       </button>
     }
   </nav>
 
-  <div class="settings-page__content">
+  <!-- Content panel -->
+  <div class="flex-1 min-w-0">
     @switch (activeTab) {
       @case ('profile') {
         <app-settings-profile></app-settings-profile>

@@ -1,83 +1,132 @@
-<h2 mat-dialog-title>{{ dialogTitle }}</h2>
+<div class="p-6 flex flex-col gap-5" [formGroup]="form">
+  <!-- Dialog title -->
+  <h2 class="text-lg font-semibold text-foreground">{{ dialogTitle }}</h2>
 
-<mat-dialog-content [formGroup]="form" class="log-dialog">
-  <div class="log-dialog__section">
-    <span class="log-dialog__label">Type</span>
-    <mat-radio-group formControlName="type" class="log-dialog__type-group">
+  <div class="h-px bg-border"></div>
+
+  <!-- Activity type radio group -->
+  <div class="flex flex-col gap-2">
+    <span class="text-sm font-medium leading-none">Type</span>
+    <div class="flex flex-wrap gap-2">
       @for (type of activityTypes; track type) {
-        <mat-radio-button [value]="type" class="log-dialog__type-option">
-          <mat-icon [style.color]="typeMeta[type].color">{{ typeMeta[type].icon }}</mat-icon>
+        <label
+          class="flex items-center gap-2 cursor-pointer rounded-md border px-3 py-2 text-sm transition-colors"
+          [class]="form.controls.type.value === type ? 'border-primary bg-primary/10 text-primary' : 'border-input bg-background hover:bg-muted/50'"
+        >
+          <input
+            type="radio"
+            class="sr-only"
+            [value]="type"
+            formControlName="type"
+          />
+          <span class="material-icons-round text-base" [style.color]="typeMeta[type].color">{{ typeMeta[type].icon }}</span>
           <span>{{ typeMeta[type].label }}</span>
-        </mat-radio-button>
+        </label>
       }
-    </mat-radio-group>
+    </div>
   </div>
 
-  <mat-form-field appearance="outline" class="log-dialog__field">
-    <mat-label>Title</mat-label>
-    <input matInput formControlName="title" />
+  <!-- Title -->
+  <div class="flex flex-col gap-1.5">
+    <label class="text-sm font-medium leading-none" for="log-title">Title</label>
+    <input
+      id="log-title"
+      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      formControlName="title"
+      placeholder="Activity title"
+    />
     @if (form.controls.title.touched && form.controls.title.invalid) {
-      <mat-error>Title is required</mat-error>
+      <p class="text-xs text-destructive">Title is required</p>
     }
-  </mat-form-field>
+  </div>
 
-  <mat-form-field appearance="outline" class="log-dialog__field">
-    <mat-label>Description</mat-label>
-    <textarea matInput formControlName="description" rows="3"></textarea>
-  </mat-form-field>
+  <!-- Description -->
+  <div class="flex flex-col gap-1.5">
+    <label class="text-sm font-medium leading-none" for="log-desc">Description</label>
+    <textarea
+      id="log-desc"
+      class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+      formControlName="description"
+      rows="3"
+      placeholder="Optional description..."
+    ></textarea>
+  </div>
 
-  <mat-form-field appearance="outline" class="log-dialog__field">
-    <mat-label>Contact</mat-label>
-    <input matInput formControlName="contactSearch" [matAutocomplete]="contactAuto" />
-    <mat-autocomplete
-      #contactAuto="matAutocomplete"
-      [displayWith]="displayContact"
-      (optionSelected)="onContactSelected($event.option.value)"
-    >
+  <!-- Contact (datalist autocomplete) -->
+  <div class="flex flex-col gap-1.5">
+    <label class="text-sm font-medium leading-none" for="log-contact">Contact</label>
+    <input
+      id="log-contact"
+      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      formControlName="contactSearch"
+      list="log-contact-list"
+      placeholder="Search contacts..."
+    />
+    <datalist id="log-contact-list">
       @for (contact of filteredContacts; track contact.id) {
-        <mat-option [value]="contact">
-          {{ contact.firstName }} {{ contact.lastName }}
-          <span class="log-dialog__option-sub">{{ contact.email }}</span>
-        </mat-option>
+        <option [value]="contact.firstName + ' ' + contact.lastName + ' (' + contact.email + ')'"></option>
       }
-    </mat-autocomplete>
-  </mat-form-field>
+    </datalist>
+  </div>
 
-  <mat-form-field appearance="outline" class="log-dialog__field">
-    <mat-label>Deal</mat-label>
-    <input matInput formControlName="dealSearch" [matAutocomplete]="dealAuto" />
-    <mat-autocomplete
-      #dealAuto="matAutocomplete"
-      [displayWith]="displayDeal"
-      (optionSelected)="onDealSelected($event.option.value)"
-    >
+  <!-- Deal (datalist autocomplete) -->
+  <div class="flex flex-col gap-1.5">
+    <label class="text-sm font-medium leading-none" for="log-deal">Deal</label>
+    <input
+      id="log-deal"
+      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      formControlName="dealSearch"
+      list="log-deal-list"
+      placeholder="Search deals..."
+    />
+    <datalist id="log-deal-list">
       @for (deal of filteredDeals; track deal.id) {
-        <mat-option [value]="deal">{{ deal.title }}</mat-option>
+        <option [value]="deal.title"></option>
       }
-    </mat-autocomplete>
-  </mat-form-field>
+    </datalist>
+  </div>
 
-  <mat-form-field appearance="outline" class="log-dialog__field">
-    <mat-label>Status</mat-label>
-    <mat-select formControlName="status">
-      <mat-option value="pending">Pending</mat-option>
-      <mat-option value="completed">Completed</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <!-- Status -->
+  <div class="flex flex-col gap-1.5">
+    <label class="text-sm font-medium leading-none" for="log-status">Status</label>
+    <select
+      id="log-status"
+      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+      formControlName="status"
+    >
+      <option value="pending">Pending</option>
+      <option value="completed">Completed</option>
+    </select>
+  </div>
 
+  <!-- Due date (conditional) -->
   @if (showDueDate) {
-    <mat-form-field appearance="outline" class="log-dialog__field">
-      <mat-label>Due date</mat-label>
-      <input matInput [matDatepicker]="duePicker" formControlName="dueDate" />
-      <mat-datepicker-toggle matIconSuffix [for]="duePicker"></mat-datepicker-toggle>
-      <mat-datepicker #duePicker></mat-datepicker>
-    </mat-form-field>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium leading-none" for="log-dueDate">Due date</label>
+      <input
+        id="log-dueDate"
+        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        type="date"
+        formControlName="dueDate"
+      />
+    </div>
   }
-</mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="onCancel()">Cancel</button>
-  <button mat-flat-button color="primary" type="button" (click)="onSubmit()">
-    {{ isEdit ? 'Save' : 'Log Activity' }}
-  </button>
-</mat-dialog-actions>
+  <div class="h-px bg-border"></div>
+
+  <!-- Dialog actions -->
+  <div class="flex items-center justify-end gap-3">
+    <button
+      type="button"
+      class="inline-flex items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+      (click)="onCancel()"
+    >Cancel</button>
+    <button
+      type="button"
+      class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+      (click)="onSubmit()"
+    >
+      {{ isEdit ? 'Save' : 'Log Activity' }}
+    </button>
+  </div>
+</div>
