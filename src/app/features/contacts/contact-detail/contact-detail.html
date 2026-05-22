@@ -1,0 +1,243 @@
+@if (contact$ | async; as contact) {
+  <div class="contact-detail">
+    <div class="contact-detail__sidebar surface rounded-lg border">
+      <app-avatar [src]="contact.avatar" [name]="fullName(contact)" size="xl"></app-avatar>
+
+      <h2 class="contact-detail__name">{{ fullName(contact) }}</h2>
+      @if (contact.jobTitle) {
+        <p class="contact-detail__subtitle">{{ contact.jobTitle }}</p>
+      }
+      @if (contact.companyName) {
+        <p class="contact-detail__subtitle">
+          @if (contact.companyId) {
+            <a class="contact-detail__link" [routerLink]="['/companies', contact.companyId]">
+              {{ contact.companyName }}
+            </a>
+          } @else {
+            {{ contact.companyName }}
+          }
+        </p>
+      }
+
+      <span [class]="contactStatusClass(contact.status)" class="contact-detail__status">
+        {{ statusLabels[contact.status] }}
+      </span>
+
+      <section class="contact-detail__section">
+        <h3 class="contact-detail__section-title">Contact info</h3>
+        <a class="contact-detail__info-row" [href]="'mailto:' + contact.email">
+          <mat-icon>email</mat-icon>
+          {{ contact.email }}
+        </a>
+        @if (contact.phone) {
+          <a class="contact-detail__info-row" [href]="'tel:' + contact.phone">
+            <mat-icon>phone</mat-icon>
+            {{ contact.phone }}
+          </a>
+        }
+        @if (contact.socialLinks?.website) {
+          <a
+            class="contact-detail__info-row"
+            [href]="contact.socialLinks!.website!"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <mat-icon>language</mat-icon>
+            {{ contact.socialLinks!.website }}
+          </a>
+        }
+      </section>
+
+      @if (contact.socialLinks?.linkedin || contact.socialLinks?.twitter) {
+        <section class="contact-detail__section">
+          <h3 class="contact-detail__section-title">Social</h3>
+          <div class="contact-detail__social">
+            @if (contact.socialLinks?.linkedin) {
+              <a
+                [href]="contact.socialLinks!.linkedin!"
+                target="_blank"
+                rel="noopener noreferrer"
+                mat-icon-button
+                aria-label="LinkedIn"
+              >
+                <mat-icon>link</mat-icon>
+              </a>
+            }
+            @if (contact.socialLinks?.twitter) {
+              <a
+                [href]="'https://twitter.com/' + contact.socialLinks!.twitter"
+                target="_blank"
+                rel="noopener noreferrer"
+                mat-icon-button
+                aria-label="Twitter"
+              >
+                <mat-icon>tag</mat-icon>
+              </a>
+            }
+          </div>
+        </section>
+      }
+
+      @if (contact.tags.length) {
+        <section class="contact-detail__section">
+          <h3 class="contact-detail__section-title">Tags</h3>
+          <mat-chip-set>
+            @for (tag of contact.tags; track tag) {
+              <mat-chip>{{ tag }}</mat-chip>
+            }
+          </mat-chip-set>
+        </section>
+      }
+
+      <div class="contact-detail__actions">
+        <button mat-stroked-button type="button" (click)="onEdit(contact)">
+          <mat-icon>edit</mat-icon>
+          Edit
+        </button>
+        <button mat-stroked-button color="warn" type="button" (click)="onDelete(contact)">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      </div>
+    </div>
+
+    <div class="contact-detail__main surface rounded-lg border">
+      <mat-tab-group animationDuration="200ms">
+        <mat-tab label="Overview">
+          <div class="contact-detail__tab-content">
+            <section class="contact-detail__block">
+              <h3>Notes</h3>
+              <mat-form-field class="contact-detail__notes" appearance="outline">
+                <mat-label>Notes</mat-label>
+                <textarea
+                  matInput
+                  [formControl]="notesControl"
+                  rows="5"
+                  placeholder="Add notes about this contact..."
+                ></textarea>
+              </mat-form-field>
+            </section>
+
+            <section class="contact-detail__block">
+              <h3>Address</h3>
+              @if (formatAddress(contact)) {
+                <p>{{ formatAddress(contact) }}</p>
+              } @else {
+                <p class="text-muted">No address on file</p>
+              }
+            </section>
+
+            <section class="contact-detail__block contact-detail__meta-grid">
+              <div>
+                <span class="contact-detail__meta-label">Lead source</span>
+                <span>{{ leadSourceLabels[contact.leadSource] }}</span>
+              </div>
+              <div>
+                <span class="contact-detail__meta-label">Created</span>
+                <span>{{ contact.createdAt | date: 'mediumDate' }}</span>
+              </div>
+              <div>
+                <span class="contact-detail__meta-label">Last contacted</span>
+                <span>
+                  @if (contact.lastContactedAt) {
+                    {{ contact.lastContactedAt | timeAgo }}
+                  } @else {
+                    Never
+                  }
+                </span>
+              </div>
+            </section>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Deals">
+          <div class="contact-detail__tab-content">
+            <div class="contact-detail__tab-toolbar">
+              <h3>Deals</h3>
+              <button mat-stroked-button type="button" (click)="onAddDeal()">
+                <mat-icon>add</mat-icon>
+                Add Deal
+              </button>
+            </div>
+            @if (deals$ | async; as deals) {
+              @if (deals.length === 0) {
+                <p class="text-muted">No deals linked to this contact.</p>
+              } @else {
+                <ul class="contact-detail__deals-list">
+                  @for (deal of deals; track deal.id) {
+                    <li class="contact-detail__deal-item">
+                      <div>
+                        <a class="contact-detail__link" [routerLink]="['/deals', deal.id]">{{ deal.title }}</a>
+                        <span [class]="dealStageClass(deal.stage)">{{ dealStageLabel(deal.stage) }}</span>
+                      </div>
+                      <div class="contact-detail__deal-meta">
+                        <span>{{ deal.value | currencyFormat }}</span>
+                        <span>Close: {{ deal.expectedCloseDate | date: 'mediumDate' }}</span>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              }
+            }
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Activities">
+          <div class="contact-detail__tab-content">
+            <div class="contact-detail__tab-toolbar">
+              <h3>Activity timeline</h3>
+              <button mat-stroked-button type="button" (click)="onLogActivity()">
+                <mat-icon>add</mat-icon>
+                Log Activity
+              </button>
+            </div>
+            @if (activities$ | async; as activities) {
+              @if (activities.length === 0) {
+                <p class="text-muted">No activities logged yet.</p>
+              } @else {
+                <ul class="contact-detail__timeline">
+                  @for (activity of activities; track activity.id) {
+                    <li class="contact-detail__timeline-item">
+                      <div class="contact-detail__timeline-icon">
+                        <mat-icon>{{ activityIcon(activity.type) }}</mat-icon>
+                      </div>
+                      <div class="contact-detail__timeline-body">
+                        <strong>{{ activity.title }}</strong>
+                        @if (activity.description) {
+                          <p>{{ activity.description }}</p>
+                        }
+                        <time>{{ activity.createdAt | timeAgo }}</time>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              }
+            }
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Files">
+          <div class="contact-detail__tab-content">
+            <app-empty-state
+              icon="folder_open"
+              title="No files attached"
+              description="Upload documents and files related to this contact."
+              actionLabel="Upload file"
+              (action)="onUploadFile()"
+            ></app-empty-state>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+} @else if (loading$ | async) {
+  <app-loading-spinner></app-loading-spinner>
+} @else {
+  <app-empty-state
+    icon="person_off"
+    title="Contact not found"
+    description="This contact may have been deleted or the link is invalid."
+    actionLabel="Back to contacts"
+    (action)="onBackToContacts()"
+  ></app-empty-state>
+}

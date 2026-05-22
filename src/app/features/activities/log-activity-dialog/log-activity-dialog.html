@@ -1,0 +1,83 @@
+<h2 mat-dialog-title>{{ dialogTitle }}</h2>
+
+<mat-dialog-content [formGroup]="form" class="log-dialog">
+  <div class="log-dialog__section">
+    <span class="log-dialog__label">Type</span>
+    <mat-radio-group formControlName="type" class="log-dialog__type-group">
+      @for (type of activityTypes; track type) {
+        <mat-radio-button [value]="type" class="log-dialog__type-option">
+          <mat-icon [style.color]="typeMeta[type].color">{{ typeMeta[type].icon }}</mat-icon>
+          <span>{{ typeMeta[type].label }}</span>
+        </mat-radio-button>
+      }
+    </mat-radio-group>
+  </div>
+
+  <mat-form-field appearance="outline" class="log-dialog__field">
+    <mat-label>Title</mat-label>
+    <input matInput formControlName="title" />
+    @if (form.controls.title.touched && form.controls.title.invalid) {
+      <mat-error>Title is required</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="log-dialog__field">
+    <mat-label>Description</mat-label>
+    <textarea matInput formControlName="description" rows="3"></textarea>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="log-dialog__field">
+    <mat-label>Contact</mat-label>
+    <input matInput formControlName="contactSearch" [matAutocomplete]="contactAuto" />
+    <mat-autocomplete
+      #contactAuto="matAutocomplete"
+      [displayWith]="displayContact"
+      (optionSelected)="onContactSelected($event.option.value)"
+    >
+      @for (contact of filteredContacts; track contact.id) {
+        <mat-option [value]="contact">
+          {{ contact.firstName }} {{ contact.lastName }}
+          <span class="log-dialog__option-sub">{{ contact.email }}</span>
+        </mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="log-dialog__field">
+    <mat-label>Deal</mat-label>
+    <input matInput formControlName="dealSearch" [matAutocomplete]="dealAuto" />
+    <mat-autocomplete
+      #dealAuto="matAutocomplete"
+      [displayWith]="displayDeal"
+      (optionSelected)="onDealSelected($event.option.value)"
+    >
+      @for (deal of filteredDeals; track deal.id) {
+        <mat-option [value]="deal">{{ deal.title }}</mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="log-dialog__field">
+    <mat-label>Status</mat-label>
+    <mat-select formControlName="status">
+      <mat-option value="pending">Pending</mat-option>
+      <mat-option value="completed">Completed</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  @if (showDueDate) {
+    <mat-form-field appearance="outline" class="log-dialog__field">
+      <mat-label>Due date</mat-label>
+      <input matInput [matDatepicker]="duePicker" formControlName="dueDate" />
+      <mat-datepicker-toggle matIconSuffix [for]="duePicker"></mat-datepicker-toggle>
+      <mat-datepicker #duePicker></mat-datepicker>
+    </mat-form-field>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="onCancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="button" (click)="onSubmit()">
+    {{ isEdit ? 'Save' : 'Log Activity' }}
+  </button>
+</mat-dialog-actions>

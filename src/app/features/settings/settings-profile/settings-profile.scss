@@ -1,0 +1,12 @@
+@use '../settings-shared';
+
+.settings-profile__avatar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.settings-profile__upload {
+  display: block;
+}

@@ -1,0 +1,39 @@
+<section class="settings-section">
+  <h2 class="settings-section__title">Appearance</h2>
+  <p class="settings-section__desc">Customize how Arcflow looks on your device.</p>
+
+  <div class="settings-appearance__group">
+    <h3 class="settings-appearance__label">Theme</h3>
+    <div class="settings-appearance__theme-cards">
+      @for (opt of themeOptions; track opt.value) {
+        <button
+          type="button"
+          class="settings-appearance__theme-card"
+          [class.settings-appearance__theme-card--active]="themePreference === opt.value"
+          (click)="selectTheme(opt.value)"
+        >
+          <mat-icon>{{ opt.icon }}</mat-icon>
+          <span>{{ opt.label }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="settings-appearance__group">
+    <h3 class="settings-appearance__label">Accent color</h3>
+    <div class="settings-appearance__swatches">
+      @for (accent of accentOptions; track accent.id) {
+        <button
+          type="button"
+          class="settings-appearance__swatch"
+          [class.settings-appearance__swatch--active]="accentColor === accent.id"
+          [style.background-color]="accent.primary"
+          [attr.aria-label]="accent.label"
+          (click)="selectAccent(accent.id)"
+        ></button>
+      }
+    </div>
+  </div>
+
+  <button mat-flat-button color="primary" type="button" (click)="onSave()">Save</button>
+</section>

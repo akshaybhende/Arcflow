@@ -1,0 +1,37 @@
+<app-page-header title="Settings" subtitle="Account and application preferences"></app-page-header>
+
+<div class="settings-page">
+  <nav class="settings-page__nav" aria-label="Settings sections">
+    @for (item of navItems; track item.id) {
+      <button
+        type="button"
+        class="settings-page__nav-item"
+        [class.settings-page__nav-item--active]="activeTab === item.id"
+        (click)="selectTab(item.id)"
+      >
+        <mat-icon>{{ item.icon }}</mat-icon>
+        {{ item.label }}
+      </button>
+    }
+  </nav>
+
+  <div class="settings-page__content">
+    @switch (activeTab) {
+      @case ('profile') {
+        <app-settings-profile></app-settings-profile>
+      }
+      @case ('appearance') {
+        <app-settings-appearance></app-settings-appearance>
+      }
+      @case ('notifications') {
+        <app-settings-notifications></app-settings-notifications>
+      }
+      @case ('team') {
+        <app-settings-team></app-settings-team>
+      }
+      @case ('about') {
+        <app-settings-about></app-settings-about>
+      }
+    }
+  </div>
+</div>

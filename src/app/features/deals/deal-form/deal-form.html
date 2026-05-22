@@ -1,0 +1,112 @@
+<div class="deal-form">
+  <app-page-header
+    [title]="isEditMode ? 'Edit Deal' : 'New Deal'"
+    [subtitle]="isEditMode ? 'Update deal details' : 'Create a new opportunity'"
+  />
+
+  <form class="deal-form__body" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <section class="deal-form__section">
+      <h2>Deal information</h2>
+
+      <mat-form-field appearance="outline" class="deal-form__field">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title" />
+        @if (submitted && form.controls.title.invalid) {
+          <mat-error>Title is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="deal-form__field">
+        <mat-label>Contact</mat-label>
+        <input
+          matInput
+          formControlName="contactName"
+          [matAutocomplete]="contactAuto"
+          placeholder="Search contacts..."
+        />
+        <mat-autocomplete
+          #contactAuto="matAutocomplete"
+          [displayWith]="displayContact"
+          (optionSelected)="onContactSelected($event.option.value)"
+        >
+          @for (contact of filteredContacts$ | async; track contact.id) {
+            <mat-option [value]="contact">
+              {{ contact.firstName }} {{ contact.lastName }} — {{ contact.companyName }}
+            </mat-option>
+          }
+        </mat-autocomplete>
+        @if (submitted && form.controls.contactId.invalid) {
+          <mat-error>Contact is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="deal-form__field">
+        <mat-label>Company</mat-label>
+        <input matInput formControlName="companyName" />
+      </mat-form-field>
+
+      <div class="deal-form__row">
+        <mat-form-field appearance="outline" class="deal-form__field">
+          <mat-label>Stage</mat-label>
+          <mat-select formControlName="stage">
+            @for (stage of stages; track stage) {
+              <mat-option [value]="stage">{{ stageLabels[stage] }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="deal-form__field deal-form__field--value">
+          <mat-label>Value</mat-label>
+          <span matTextPrefix>$&nbsp;</span>
+          <input matInput type="number" formControlName="value" min="0" />
+        </mat-form-field>
+      </div>
+
+      <div class="deal-form__row">
+        <div class="deal-form__priority">
+          <label>Priority</label>
+          <mat-radio-group formControlName="priority">
+            @for (p of priorities; track p) {
+              <mat-radio-button [value]="p">{{ p | titlecase }}</mat-radio-button>
+            }
+          </mat-radio-group>
+        </div>
+
+        <div class="deal-form__probability">
+          <label>Probability: {{ form.controls.probability.value }}%</label>
+          <mat-slider min="0" max="100" step="5" discrete>
+            <input matSliderThumb formControlName="probability" />
+          </mat-slider>
+        </div>
+      </div>
+
+      <mat-form-field appearance="outline" class="deal-form__field">
+        <mat-label>Expected close date</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="expectedCloseDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="picker" />
+        <mat-datepicker #picker />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="deal-form__field">
+        <mat-label>Tags</mat-label>
+        <input matInput formControlName="tags" placeholder="Comma-separated tags" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="deal-form__field">
+        <mat-label>Notes</mat-label>
+        <textarea matInput formControlName="notes" rows="4"></textarea>
+      </mat-form-field>
+    </section>
+
+    <div class="deal-form__actions">
+      <button mat-stroked-button type="button" (click)="onCancel()">Cancel</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="saving">
+        @if (saving) {
+          Saving...
+        } @else {
+          {{ isEditMode ? 'Save Deal' : 'Create Deal' }}
+        }
+      </button>
+    </div>
+  </form>
+</div>

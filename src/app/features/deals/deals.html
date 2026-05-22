@@ -1,0 +1,219 @@
+<div class="deals-page">
+  <div class="deals-page__header">
+    <div>
+      <app-page-header title="Deals" />
+      @if (pipelineValue$ | async; as pipeline) {
+        <p class="deals-page__pipeline">Pipeline: {{ pipeline | currencyFormat }}</p>
+      }
+    </div>
+    <div class="deals-page__header-actions">
+      <button mat-flat-button color="primary" type="button" (click)="navigateToNew()">
+        <mat-icon>add</mat-icon>
+        Add Deal
+      </button>
+    </div>
+  </div>
+
+  <div class="deals-page__toolbar">
+    <mat-form-field appearance="outline" class="deals-page__search">
+      <mat-label>Search deals</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput [formControl]="searchControl" placeholder="Title, contact, company..." />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="deals-page__filter">
+      <mat-label>Stage</mat-label>
+      <mat-select [formControl]="stageFilter">
+        <mat-option value="all">All stages</mat-option>
+        @for (stage of stages; track stage) {
+          <mat-option [value]="stage">{{ stageLabels[stage] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="deals-page__filter">
+      <mat-label>Owner</mat-label>
+      <mat-select [formControl]="ownerFilter">
+        @for (owner of owners$ | async; track owner) {
+          <mat-option [value]="owner">{{ owner === 'all' ? 'All owners' : owner }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-button-toggle-group
+      class="deals-page__view-toggle"
+      [value]="viewMode"
+      (change)="setViewMode($event.value)"
+    >
+      <mat-button-toggle value="kanban">
+        <mat-icon>view_kanban</mat-icon>
+        Kanban
+      </mat-button-toggle>
+      <mat-button-toggle value="list">
+        <mat-icon>view_list</mat-icon>
+        List
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  @if (loading$ | async) {
+    <app-loading-spinner />
+  } @else if (viewMode === 'kanban') {
+    @if (dealsByStage$ | async; as dealsByStage) {
+      <div class="deals-kanban" cdkDropListGroup>
+        @for (stage of stages; track stage) {
+          <div
+            class="deals-kanban__column"
+            [class.deals-kanban__column--won]="stage === 'won'"
+            [class.deals-kanban__column--lost]="stage === 'lost'"
+          >
+            <div
+              class="deals-kanban__header"
+              [style.border-top-color]="stageColors[stage]"
+            >
+              <h3 class="deals-kanban__title">{{ stageLabels[stage] }}</h3>
+              <div class="deals-kanban__meta">
+                <span>{{ dealsByStage[stage].length }} deals</span>
+                <span class="deals-kanban__value">{{ columnTotal(dealsByStage[stage]) | currencyFormat }}</span>
+              </div>
+            </div>
+
+            <div
+              class="deals-kanban__list"
+              cdkDropList
+              [id]="stage"
+              [cdkDropListData]="dealsByStage[stage]"
+              (cdkDropListDropped)="onDrop($event, stage)"
+            >
+              @for (deal of dealsByStage[stage]; track deal.id) {
+                <article
+                  class="deal-card"
+                  cdkDrag
+                  [cdkDragData]="deal"
+                  [class.deal-card--won]="stage === 'won'"
+                  [class.deal-card--lost]="stage === 'lost'"
+                  (click)="navigateToDeal(deal.id)"
+                >
+                  <h4 class="deal-card__title">{{ deal.title }}</h4>
+                  <p class="deal-card__contact">
+                    {{ deal.contactName }}
+                    @if (deal.companyName) {
+                      <span> · {{ deal.companyName }}</span>
+                    }
+                  </p>
+                  <div class="deal-card__footer">
+                    <span class="deal-card__value">{{ deal.value | currencyFormat }}</span>
+                    <span
+                      class="deal-card__priority"
+                      [style.background-color]="priorityColors[deal.priority]"
+                      [attr.title]="deal.priority"
+                    ></span>
+                    <span
+                      class="deal-card__date"
+                      [class.deal-card__date--overdue]="isOverdue(deal.expectedCloseDate)"
+                    >
+                      {{ formatCloseDate(deal.expectedCloseDate) }}
+                    </span>
+                    <app-avatar [name]="deal.owner" size="sm" />
+                  </div>
+                </article>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <div class="deals-list">
+      <table mat-table [dataSource]="dataSource" class="deals-list__table">
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>Title</th>
+          <td mat-cell *matCellDef="let deal">
+            <a class="deals-list__link" [routerLink]="['/deals', deal.id]">{{ deal.title }}</a>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="contact">
+          <th mat-header-cell *matHeaderCellDef>Contact</th>
+          <td mat-cell *matCellDef="let deal">{{ deal.contactName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="company">
+          <th mat-header-cell *matHeaderCellDef>Company</th>
+          <td mat-cell *matCellDef="let deal">{{ deal.companyName || '—' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="stage">
+          <th mat-header-cell *matHeaderCellDef>Stage</th>
+          <td mat-cell *matCellDef="let deal">
+            <span
+              class="deals-list__badge"
+              [style.background-color]="stageColor(deal.stage)"
+            >
+              {{ stageLabel(deal.stage) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="value">
+          <th mat-header-cell *matHeaderCellDef>Value</th>
+          <td mat-cell *matCellDef="let deal">{{ deal.value | currencyFormat }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="priority">
+          <th mat-header-cell *matHeaderCellDef>Priority</th>
+          <td mat-cell *matCellDef="let deal">
+            <span
+              class="deal-card__priority"
+              [style.background-color]="priorityColor(deal.priority)"
+            ></span>
+            {{ deal.priority }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="closeDate">
+          <th mat-header-cell *matHeaderCellDef>Close Date</th>
+          <td mat-cell *matCellDef="let deal">{{ formatCloseDate(deal.expectedCloseDate) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="owner">
+          <th mat-header-cell *matHeaderCellDef>Owner</th>
+          <td mat-cell *matCellDef="let deal">
+            <app-avatar [name]="deal.owner" size="sm" />
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let deal">
+            <button mat-icon-button type="button" [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item type="button" [routerLink]="['/deals', deal.id]">View</button>
+              <button mat-menu-item type="button" (click)="navigateToEdit(deal.id, $event)">Edit</button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="listColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: listColumns"
+          class="deals-list__row"
+          [routerLink]="['/deals', row.id]"
+        ></tr>
+      </table>
+
+      @if (!dataSource.data.length) {
+        <app-empty-state
+          icon="handshake"
+          title="No deals found"
+          description="Try adjusting your filters or add a new deal."
+          actionLabel="Add Deal"
+          (action)="navigateToNew()"
+        />
+      }
+    </div>
+  }
+</div>

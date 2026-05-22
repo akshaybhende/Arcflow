@@ -1,0 +1,42 @@
+.page-header__breadcrumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+  font-size: 0.8125rem;
+}
+
+.page-header__crumb {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+
+  &:hover:not(.page-header__crumb--current) {
+    color: var(--color-text-link);
+  }
+
+  &--current {
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+}
+
+.page-header__separator {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+  color: var(--color-text-tertiary);
+}
+
+.page-header__title {
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.page-header__subtitle {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+}

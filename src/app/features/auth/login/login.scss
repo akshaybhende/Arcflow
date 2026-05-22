@@ -1,0 +1,142 @@
+.login {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+.login__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  background: linear-gradient(160deg, var(--color-brand-900) 0%, var(--color-brand-700) 55%, var(--color-primary) 100%);
+  color: var(--color-text-inverse);
+}
+
+.login__brand-inner {
+  max-width: 28rem;
+}
+
+.login__logo,
+.login__form-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.login__tagline {
+  margin: var(--space-10) 0 var(--space-4);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.login__brand-copy {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.login__panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  background: var(--color-bg);
+}
+
+.login__form-wrap {
+  width: 100%;
+  max-width: 24rem;
+}
+
+.login__form-logo {
+  margin-bottom: var(--space-8);
+  color: var(--color-primary);
+}
+
+.login__header {
+  margin-bottom: var(--space-6);
+
+  h2 {
+    margin: 0 0 var(--space-2);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+}
+
+.login__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-subtle);
+  color: var(--color-danger);
+  font-size: 0.875rem;
+
+  mat-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+  }
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.login__field {
+  width: 100%;
+}
+
+.login__remember {
+  margin: var(--space-2) 0 var(--space-4);
+}
+
+.login__submit {
+  width: 100%;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.login__demo-hint {
+  margin: var(--space-6) 0 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 900px) {
+  .login {
+    grid-template-columns: 1fr;
+  }
+
+  .login__brand {
+    display: none;
+  }
+}

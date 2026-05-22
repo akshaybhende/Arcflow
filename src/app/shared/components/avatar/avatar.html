@@ -1,0 +1,13 @@
+<div
+  class="avatar"
+  [class]="'avatar--' + size + ' avatar--' + shape"
+  [style.background-color]="showImage ? undefined : backgroundColor"
+>
+  @if (showImage) {
+    <img [src]="src" [alt]="name || 'Avatar'" (error)="onImageError()" />
+  } @else if (name) {
+    <span class="avatar__initials">{{ name | initials }}</span>
+  } @else {
+    <mat-icon class="avatar__fallback-icon">person</mat-icon>
+  }
+</div>

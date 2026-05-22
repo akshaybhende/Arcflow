@@ -1,0 +1,169 @@
+.contacts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.contacts-list__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.contacts-list__title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.contacts-list__count {
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--space-2);
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-full);
+}
+
+.contacts-list__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.contacts-list__search {
+  flex: 1;
+  min-width: 220px;
+}
+
+.contacts-list__view-toggle {
+  margin-left: auto;
+}
+
+.contacts-list__table-wrap {
+  overflow: hidden;
+}
+
+.contacts-list__table {
+  width: 100%;
+}
+
+.contacts-list__row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--color-bg-subtle);
+  }
+}
+
+.contacts-list__name-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.contacts-list__name {
+  font-weight: var(--font-weight-medium);
+}
+
+.contacts-list__email {
+  color: var(--color-text-link);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.contacts-list__actions-header,
+.contacts-list__actions {
+  width: 48px;
+  text-align: right;
+}
+
+.contacts-list__cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.contacts-list__card {
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+}
+
+.contacts-list__card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.contacts-list__card-name {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.contacts-list__card-meta {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.status-badge--active {
+  color: var(--color-success);
+  background: var(--color-success-subtle);
+}
+
+.status-badge--prospect {
+  color: var(--color-info);
+  background: var(--color-info-subtle, var(--color-primary-subtle));
+}
+
+.status-badge--customer {
+  color: var(--color-primary);
+  background: var(--color-primary-subtle);
+}
+
+.status-badge--churned {
+  color: var(--color-danger);
+  background: var(--color-danger-subtle, #fef2f2);
+}
+
+.status-badge--inactive {
+  color: var(--color-text-secondary);
+  background: var(--color-bg-muted);
+}

@@ -1,0 +1,44 @@
+<aside class="sidebar" [class.collapsed]="collapsed$ | async">
+  <div class="sidebar__header">
+    <div class="sidebar__logo">
+      <mat-icon class="sidebar__logo-icon" aria-hidden="true">hub</mat-icon>
+      <span class="sidebar__logo-text">Arcflow</span>
+    </div>
+  </div>
+
+  <div class="sidebar__user">
+    <app-avatar [src]="currentUser.avatar" [name]="currentUser.name" size="md"></app-avatar>
+    <div class="sidebar__user-info">
+      <span class="sidebar__user-name">{{ currentUser.name }}</span>
+      <span class="sidebar__user-email">{{ currentUser.email }}</span>
+    </div>
+  </div>
+
+  <nav class="sidebar__nav" aria-label="Main navigation">
+    @for (item of navItems; track item.route) {
+      <a
+        class="nav-item"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [matTooltip]="item.label"
+        [matTooltipDisabled]="!(collapsed$ | async)"
+        matTooltipPosition="right"
+      >
+        <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar__footer">
+    <button
+      type="button"
+      class="sidebar__toggle"
+      (click)="onToggleCollapse()"
+      [attr.aria-label]="(collapsed$ | async) ? 'Expand sidebar' : 'Collapse sidebar'"
+    >
+      <mat-icon>{{ (collapsed$ | async) ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+      <span class="nav-label">{{ (collapsed$ | async) ? 'Expand' : 'Collapse' }}</span>
+    </button>
+  </div>
+</aside>

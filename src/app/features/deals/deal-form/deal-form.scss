@@ -1,0 +1,62 @@
+.deal-form__body {
+  max-width: 720px;
+  margin-top: var(--space-4);
+}
+
+.deal-form__section {
+  padding: var(--space-6);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+
+  h2 {
+    margin: 0 0 var(--space-4);
+    font-size: 1rem;
+  }
+}
+
+.deal-form__field {
+  width: 100%;
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.deal-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.deal-form__priority,
+.deal-form__probability {
+  label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+}
+
+.deal-form__priority mat-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.deal-form__probability mat-slider {
+  width: 100%;
+}
+
+.deal-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .deal-form__row {
+    grid-template-columns: 1fr;
+  }
+}

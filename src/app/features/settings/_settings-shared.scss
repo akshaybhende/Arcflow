@@ -1,0 +1,27 @@
+.settings-section__title {
+  margin: 0 0 var(--space-2);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.settings-section__desc {
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-secondary);
+}
+
+.settings-section__hint {
+  margin: var(--space-1) 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+}
+
+.settings-section__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 420px;
+}
+
+.settings-section__field {
+  width: 100%;
+}

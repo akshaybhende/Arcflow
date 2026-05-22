@@ -1,0 +1,21 @@
+<div class="stat-card">
+  <div class="stat-card__icon" [style.background]="iconColor">
+    <mat-icon>{{ icon }}</mat-icon>
+  </div>
+  <div class="stat-card__body">
+    <span class="stat-card__label">{{ label }}</span>
+    <span class="stat-card__value">{{ value }}</span>
+    @if (trend) {
+      <span class="stat-card__trend" [class]="'stat-card__trend--' + trendDirection">
+        @if (trendDirection === 'up') {
+          <mat-icon>trending_up</mat-icon>
+        } @else if (trendDirection === 'down') {
+          <mat-icon>trending_down</mat-icon>
+        } @else {
+          <mat-icon>trending_flat</mat-icon>
+        }
+        {{ trend }}
+      </span>
+    }
+  </div>
+</div>

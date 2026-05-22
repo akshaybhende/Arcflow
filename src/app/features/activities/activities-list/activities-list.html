@@ -1,0 +1,206 @@
+<app-page-header title="Activities" subtitle="Calls, meetings, and tasks"></app-page-header>
+
+<div class="activities-list" [formGroup]="filterForm">
+  <div class="activities-list__toolbar">
+    <mat-form-field appearance="outline" class="activities-list__filter">
+      <mat-label>Type</mat-label>
+      <mat-select formControlName="type">
+        @for (opt of typeOptions; track opt.value) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="activities-list__filter">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        @for (opt of statusOptions; track opt.value) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="activities-list__filter">
+      <mat-label>From</mat-label>
+      <input matInput [matDatepicker]="fromPicker" formControlName="dateFrom" />
+      <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
+      <mat-datepicker #fromPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="activities-list__filter">
+      <mat-label>To</mat-label>
+      <input matInput [matDatepicker]="toPicker" formControlName="dateTo" />
+      <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
+      <mat-datepicker #toPicker></mat-datepicker>
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" class="activities-list__log-btn" type="button" (click)="openLogDialog()">
+      <mat-icon>add</mat-icon>
+      Log Activity
+    </button>
+  </div>
+
+  @if (vm$ | async; as vm) {
+    @if (vm.loading) {
+      <app-loading-spinner></app-loading-spinner>
+    } @else {
+      <div class="activities-list__panels">
+        <div class="activities-list__list-panel">
+          @if (vm.activities.length === 0) {
+            <app-empty-state
+              icon="event_note"
+              title="No activities found"
+              description="Try adjusting your filters or log a new activity."
+              actionLabel="Log Activity"
+              (action)="openLogDialog()"
+            ></app-empty-state>
+          } @else {
+            <ul class="activities-list__rows">
+              @for (activity of vm.activities; track activity.id) {
+                <li
+                  class="activities-list__row"
+                  [class.activities-list__row--selected]="isSelected(activity, vm.selected)"
+                  (click)="selectActivity(activity)"
+                  (keyup.enter)="selectActivity(activity)"
+                  tabindex="0"
+                  role="button"
+                >
+                  <div
+                    class="activities-list__type-icon"
+                    [style.background-color]="typeMeta[activity.type].color + '22'"
+                  >
+                    <mat-icon [style.color]="typeMeta[activity.type].color">
+                      {{ typeMeta[activity.type].icon }}
+                    </mat-icon>
+                  </div>
+
+                  <div class="activities-list__row-body">
+                    <div class="activities-list__row-title">{{ activity.title }}</div>
+                    @if (activity.description) {
+                      <div class="activities-list__row-desc">{{ truncate(activity.description) }}</div>
+                    }
+                    <div class="activities-list__row-meta">
+                      @if (activity.contactName && activity.contactId) {
+                        <a
+                          class="activities-list__contact-link"
+                          [routerLink]="['/contacts', activity.contactId]"
+                          (click)="$event.stopPropagation()"
+                        >
+                          {{ activity.contactName }}
+                        </a>
+                      }
+                      <span
+                        class="activities-list__due"
+                        [class.activities-list__due--overdue]="isOverdue(activity)"
+                      >
+                        {{ formatDueDate(activity.dueDate) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <span class="activities-list__status" [ngClass]="statusClass(activity.status)">
+                    {{ statusLabel(activity.status) }}
+                  </span>
+
+                  @if (activity.status === 'pending') {
+                    <button
+                      mat-stroked-button
+                      class="activities-list__complete-btn"
+                      type="button"
+                      (click)="markComplete(activity, $event)"
+                    >
+                      Mark Complete
+                    </button>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        <div class="activities-list__detail-panel">
+          @if (vm.selected; as selected) {
+            <div class="activities-list__detail">
+              <div class="activities-list__detail-header">
+                <div
+                  class="activities-list__type-icon activities-list__type-icon--lg"
+                  [style.background-color]="typeMeta[selected.type].color + '22'"
+                >
+                  <mat-icon [style.color]="typeMeta[selected.type].color">
+                    {{ typeMeta[selected.type].icon }}
+                  </mat-icon>
+                </div>
+                <div>
+                  <h2 class="activities-list__detail-title">{{ selected.title }}</h2>
+                  <span class="activities-list__status" [ngClass]="statusClass(selected.status)">
+                    {{ statusLabel(selected.status) }}
+                  </span>
+                </div>
+              </div>
+
+              @if (selected.description) {
+                <p class="activities-list__detail-desc">{{ selected.description }}</p>
+              }
+
+              <div class="activities-list__detail-meta">
+                <div class="activities-list__meta-item">
+                  <span class="activities-list__meta-label">Due date</span>
+                  <span [class.activities-list__due--overdue]="isOverdue(selected)">
+                    {{ formatDueDate(selected.dueDate) }}
+                  </span>
+                </div>
+                <div class="activities-list__meta-item">
+                  <span class="activities-list__meta-label">Owner</span>
+                  <span>{{ selected.owner }}</span>
+                </div>
+              </div>
+
+              @if (selected.contactName) {
+                <div class="activities-list__contact-card">
+                  <app-avatar [name]="selected.contactName" size="md"></app-avatar>
+                  <div>
+                    @if (selected.contactId) {
+                      <a class="activities-list__contact-link" [routerLink]="['/contacts', selected.contactId]">
+                        {{ selected.contactName }}
+                      </a>
+                    } @else {
+                      <span>{{ selected.contactName }}</span>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (selected.dealName) {
+                <div class="activities-list__deal">
+                  <mat-icon>handshake</mat-icon>
+                  @if (selected.dealId) {
+                    <a [routerLink]="['/deals', selected.dealId]">{{ selected.dealName }}</a>
+                  } @else {
+                    <span>{{ selected.dealName }}</span>
+                  }
+                </div>
+              }
+
+              <div class="activities-list__detail-actions">
+                <button mat-stroked-button type="button" (click)="openLogDialog(selected)">
+                  <mat-icon>edit</mat-icon>
+                  Edit
+                </button>
+                <button mat-stroked-button color="warn" type="button" (click)="deleteActivity(selected)">
+                  <mat-icon>delete</mat-icon>
+                  Delete
+                </button>
+              </div>
+            </div>
+          } @else {
+            <app-empty-state
+              icon="touch_app"
+              title="Select an activity"
+              description="Choose an activity from the list to preview its details."
+            ></app-empty-state>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

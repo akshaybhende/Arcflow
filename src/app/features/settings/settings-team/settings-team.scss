@@ -1,0 +1,23 @@
+@use '../settings-shared';
+
+.settings-team__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.settings-team__table {
+  width: 100%;
+}
+
+.settings-team__role-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+}

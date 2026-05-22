@@ -1,0 +1,32 @@
+@use '../settings-shared';
+
+.settings-about__meta {
+  margin: var(--space-4) 0 0;
+}
+
+.settings-about__row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  dt {
+    margin: 0;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--color-text-primary);
+
+    a {
+      color: var(--color-text-link);
+    }
+  }
+}

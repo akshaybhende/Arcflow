@@ -1,0 +1,40 @@
+<section class="settings-section">
+  <h2 class="settings-section__title">Notifications</h2>
+  <p class="settings-section__desc">Choose which alerts you receive. Preferences are stored locally.</p>
+
+  <form [formGroup]="form" class="settings-section__form" (ngSubmit)="onSave()">
+    <div class="settings-notifications__toggle">
+      <div>
+        <span class="settings-notifications__toggle-label">Email notifications</span>
+        <span class="settings-section__hint">Receive updates via email</span>
+      </div>
+      <mat-slide-toggle formControlName="email"></mat-slide-toggle>
+    </div>
+
+    <div class="settings-notifications__toggle">
+      <div>
+        <span class="settings-notifications__toggle-label">In-app notifications</span>
+        <span class="settings-section__hint">Show alerts inside Arcflow</span>
+      </div>
+      <mat-slide-toggle formControlName="inApp"></mat-slide-toggle>
+    </div>
+
+    <div class="settings-notifications__toggle">
+      <div>
+        <span class="settings-notifications__toggle-label">Deal reminders</span>
+        <span class="settings-section__hint">Reminders for upcoming close dates</span>
+      </div>
+      <mat-slide-toggle formControlName="dealReminders"></mat-slide-toggle>
+    </div>
+
+    <div class="settings-notifications__toggle">
+      <div>
+        <span class="settings-notifications__toggle-label">Activity reminders</span>
+        <span class="settings-section__hint">Reminders for pending tasks and calls</span>
+      </div>
+      <mat-slide-toggle formControlName="activityReminders"></mat-slide-toggle>
+    </div>
+
+    <button mat-flat-button color="primary" type="submit">Save preferences</button>
+  </form>
+</section>

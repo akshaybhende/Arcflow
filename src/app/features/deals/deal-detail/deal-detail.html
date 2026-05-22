@@ -1,0 +1,139 @@
+@if (deal) {
+  <div class="deal-detail">
+    <nav class="deal-detail__breadcrumb">
+      <a routerLink="/deals">Deals</a>
+      <mat-icon>chevron_right</mat-icon>
+      <span>{{ deal.title }}</span>
+    </nav>
+
+    <div class="deal-detail__layout">
+      <aside class="deal-detail__sidebar">
+        <h2 class="deal-detail__title">{{ deal.title }}</h2>
+        <p class="deal-detail__value">{{ deal.value | currencyFormat }}</p>
+
+        <span
+          class="deal-detail__stage"
+          [style.background-color]="stageColors[deal.stage]"
+        >
+          {{ stageLabels[deal.stage] }}
+        </span>
+
+        <div class="deal-detail__probability">
+          <label>Probability: {{ deal.probability }}%</label>
+          <mat-slider
+            min="0"
+            max="100"
+            step="5"
+            showTickMarks
+            discrete
+            [displayWith]="formatProbability"
+          >
+            <input
+              matSliderThumb
+              [value]="deal.probability"
+              (valueChange)="onProbabilityChange($event)"
+            />
+          </mat-slider>
+        </div>
+
+        <div class="deal-detail__actions">
+          <button mat-stroked-button type="button" (click)="navigateToEdit()">Edit</button>
+          <button mat-stroked-button color="warn" type="button" (click)="confirmDelete()">Delete</button>
+        </div>
+      </aside>
+
+      <section class="deal-detail__main">
+        <mat-tab-group>
+          <mat-tab label="Overview">
+            <div class="deal-detail__tab">
+              <dl class="deal-detail__meta">
+                <dt>Owner</dt>
+                <dd>{{ deal.owner }}</dd>
+                <dt>Priority</dt>
+                <dd class="deal-detail__priority">{{ deal.priority }}</dd>
+                <dt>Expected close</dt>
+                <dd>{{ formatDate(deal.expectedCloseDate) }}</dd>
+                @if (deal.actualCloseDate) {
+                  <dt>Actual close</dt>
+                  <dd>{{ formatDate(deal.actualCloseDate) }}</dd>
+                }
+                <dt>Created</dt>
+                <dd>{{ formatDate(deal.createdAt) }}</dd>
+              </dl>
+              @if (deal.tags.length) {
+                <div class="deal-detail__tags">
+                  @for (tag of deal.tags; track tag) {
+                    <span class="deal-detail__tag">{{ tag }}</span>
+                  }
+                </div>
+              }
+              @if (deal.notes) {
+                <div class="deal-detail__notes">
+                  <h3>Notes</h3>
+                  <p>{{ deal.notes }}</p>
+                </div>
+              }
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Contact">
+            <div class="deal-detail__tab">
+              @if (contact) {
+                <article class="deal-detail__contact-card">
+                  <app-avatar [name]="contact.firstName + ' ' + contact.lastName" [src]="contact.avatar" size="lg" />
+                  <div>
+                    <h3>{{ contact.firstName }} {{ contact.lastName }}</h3>
+                    <p>{{ contact.jobTitle }}</p>
+                    <p>{{ contact.companyName }}</p>
+                    <a [href]="'mailto:' + contact.email">{{ contact.email }}</a>
+                  </div>
+                  <a mat-stroked-button [routerLink]="['/contacts', contact.id]">View contact</a>
+                </article>
+              } @else {
+                <p class="deal-detail__empty">Contact information unavailable.</p>
+              }
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Activities">
+            <div class="deal-detail__tab">
+              @if (activities.length) {
+                <ul class="deal-detail__timeline">
+                  @for (activity of activities; track activity.id) {
+                    <li class="deal-detail__timeline-item">
+                      <mat-icon>{{ activityIcon(activity.type) }}</mat-icon>
+                      <div>
+                        <strong>{{ activity.title }}</strong>
+                        @if (activity.description) {
+                          <p>{{ activity.description }}</p>
+                        }
+                        <time>{{ formatDate(activity.createdAt) }}</time>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="deal-detail__empty">No activities logged for this deal.</p>
+              }
+            </div>
+          </mat-tab>
+
+          <mat-tab label="History">
+            <div class="deal-detail__tab">
+              <ul class="deal-detail__history">
+                @for (entry of historyEntries; track entry.label) {
+                  <li>
+                    <span>{{ entry.label }}</span>
+                    <time>{{ formatDate(entry.date) }}</time>
+                  </li>
+                }
+              </ul>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </section>
+    </div>
+  </div>
+} @else {
+  <app-loading-spinner />
+}

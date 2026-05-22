@@ -1,0 +1,43 @@
+@use './tokens';
+@use './material-theme';
+@use './typography';
+@use './utilities';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  transition:
+    background-color var(--transition-normal),
+    border-color var(--transition-normal),
+    color var(--transition-normal);
+}
+
+.mat-mdc-card {
+  --mdc-elevated-card-container-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+a {
+  color: var(--color-text-link);
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}

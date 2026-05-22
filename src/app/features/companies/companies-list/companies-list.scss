@@ -1,0 +1,130 @@
+.companies-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.companies-list__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.companies-list__count {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.companies-list__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.companies-list__search {
+  flex: 1;
+  min-width: 220px;
+}
+
+.companies-list__filter {
+  width: 160px;
+}
+
+.companies-list__view-toggle {
+  margin-left: auto;
+}
+
+.companies-list__table-wrap {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.companies-list__table {
+  width: 100%;
+}
+
+.companies-list__name-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.companies-list__link {
+  color: var(--color-text-link);
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.companies-list__row {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-bg-subtle);
+  }
+}
+
+.companies-list__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.company-card {
+  padding: var(--space-5);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast);
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  h3 {
+    margin: var(--space-3) 0 var(--space-1);
+    font-size: 1rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+}
+
+.company-card__stats {
+  display: flex;
+  gap: var(--space-3);
+  margin: var(--space-3) 0;
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+.company-card__revenue {
+  font-weight: 600;
+  color: var(--color-text-primary) !important;
+  margin-bottom: var(--space-3) !important;
+}
+
+@media (max-width: 1024px) {
+  .companies-list__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .companies-list__grid {
+    grid-template-columns: 1fr;
+  }
+}

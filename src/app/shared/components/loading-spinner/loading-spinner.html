@@ -1,0 +1,6 @@
+<div class="loading-spinner" role="status" [attr.aria-label]="label">
+  <mat-spinner [diameter]="diameter"></mat-spinner>
+  @if (label) {
+    <span class="loading-spinner__label">{{ label }}</span>
+  }
+</div>

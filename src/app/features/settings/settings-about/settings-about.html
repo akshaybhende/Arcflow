@@ -1,0 +1,25 @@
+<section class="settings-section">
+  <h2 class="settings-section__title">About Arcflow</h2>
+  <p class="settings-section__desc">CRM built for modern sales teams.</p>
+
+  <dl class="settings-about__meta">
+    <div class="settings-about__row">
+      <dt>Version</dt>
+      <dd>{{ version }}</dd>
+    </div>
+    <div class="settings-about__row">
+      <dt>Build date</dt>
+      <dd>{{ buildDate }}</dd>
+    </div>
+    <div class="settings-about__row">
+      <dt>Repository</dt>
+      <dd>
+        <a [href]="repoUrl" target="_blank" rel="noopener noreferrer">{{ repoUrl }}</a>
+      </dd>
+    </div>
+    <div class="settings-about__row">
+      <dt>License</dt>
+      <dd>MIT License</dd>
+    </div>
+  </dl>
+</section>

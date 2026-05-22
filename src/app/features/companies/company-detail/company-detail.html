@@ -1,0 +1,135 @@
+@if (company) {
+  <div class="company-detail">
+    <nav class="company-detail__breadcrumb">
+      <a routerLink="/companies">Companies</a>
+      <mat-icon>chevron_right</mat-icon>
+      <span>{{ company.name }}</span>
+    </nav>
+
+    <div class="company-detail__layout">
+      <aside class="company-detail__sidebar">
+        <app-avatar [name]="company.name" [src]="company.logo" size="xl" shape="square" />
+        <h2>{{ company.name }}</h2>
+        <span class="company-detail__badge">{{ industryLabels[company.industry] }}</span>
+        <span class="company-detail__badge company-detail__badge--muted">{{ sizeLabels[company.size] }}</span>
+
+        <dl class="company-detail__info">
+          @if (company.website) {
+            <dt>Website</dt>
+            <dd><a [href]="company.website" target="_blank" rel="noopener">{{ company.website }}</a></dd>
+          }
+          @if (company.phone) {
+            <dt>Phone</dt>
+            <dd><a [href]="'tel:' + company.phone">{{ company.phone }}</a></dd>
+          }
+          @if (company.email) {
+            <dt>Email</dt>
+            <dd><a [href]="'mailto:' + company.email">{{ company.email }}</a></dd>
+          }
+          @if (formatAddress(company)) {
+            <dt>Address</dt>
+            <dd>{{ formatAddress(company) }}</dd>
+          }
+        </dl>
+
+        <div class="company-detail__actions">
+          <button mat-stroked-button type="button" (click)="navigateToEdit()">Edit</button>
+          <button mat-stroked-button color="warn" type="button" (click)="confirmDelete()">Delete</button>
+        </div>
+      </aside>
+
+      <section class="company-detail__main">
+        <mat-tab-group>
+          <mat-tab label="Overview">
+            <div class="company-detail__tab">
+              <dl class="company-detail__meta">
+                <dt>Revenue</dt>
+                <dd>{{ company.revenue ? (company.revenue | currencyFormat) : '—' }}</dd>
+                <dt>Owner</dt>
+                <dd>{{ company.owner }}</dd>
+                <dt>Domain</dt>
+                <dd>{{ company.domain || '—' }}</dd>
+                <dt>Created</dt>
+                <dd>{{ formatDate(company.createdAt) }}</dd>
+              </dl>
+              @if (company.notes) {
+                <div class="company-detail__notes">
+                  <h3>Notes</h3>
+                  <p>{{ company.notes }}</p>
+                </div>
+              }
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Contacts">
+            <div class="company-detail__tab">
+              @if (contacts.length) {
+                <div class="company-detail__cards">
+                  @for (contact of contacts; track contact.id) {
+                    <article class="company-detail__mini-card">
+                      <app-avatar [name]="contact.firstName + ' ' + contact.lastName" [src]="contact.avatar" />
+                      <div>
+                        <h4>{{ contact.firstName }} {{ contact.lastName }}</h4>
+                        <p>{{ contact.jobTitle }}</p>
+                        <p>{{ contact.email }}</p>
+                      </div>
+                      <a mat-stroked-button [routerLink]="['/contacts', contact.id]">View</a>
+                    </article>
+                  }
+                </div>
+              } @else {
+                <p class="company-detail__empty">No contacts linked to this company.</p>
+              }
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Deals">
+            <div class="company-detail__tab">
+              @if (deals.length) {
+                <ul class="company-detail__deals">
+                  @for (deal of deals; track deal.id) {
+                    <li>
+                      <a [routerLink]="['/deals', deal.id]">{{ deal.title }}</a>
+                      <span class="company-detail__deal-stage" [style.background-color]="stageColors[deal.stage]">
+                        {{ stageLabels[deal.stage] }}
+                      </span>
+                      <span>{{ deal.value | currencyFormat }}</span>
+                      <span class="company-detail__deal-date">{{ formatDate(deal.expectedCloseDate) }}</span>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="company-detail__empty">No deals linked to this company.</p>
+              }
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Activities">
+            <div class="company-detail__tab">
+              @if (activities.length) {
+                <ul class="company-detail__timeline">
+                  @for (activity of activities; track activity.id) {
+                    <li>
+                      <mat-icon>{{ activityIcon(activity.type) }}</mat-icon>
+                      <div>
+                        <strong>{{ activity.title }}</strong>
+                        @if (activity.description) {
+                          <p>{{ activity.description }}</p>
+                        }
+                        <time>{{ formatDate(activity.createdAt) }}</time>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="company-detail__empty">No activities for this company.</p>
+              }
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </section>
+    </div>
+  </div>
+} @else {
+  <app-loading-spinner />
+}

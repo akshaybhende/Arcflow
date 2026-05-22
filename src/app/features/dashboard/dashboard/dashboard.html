@@ -1,0 +1,143 @@
+<app-page-header title="Dashboard" subtitle="Overview of your CRM pipeline"></app-page-header>
+
+<section class="dashboard__stats">
+  <app-stat-card
+    label="Total Contacts"
+    [value]="(contactsTotal$ | async) ?? 0"
+    icon="people"
+    iconColor="var(--color-primary)"
+    trend="+8% vs last month"
+    trendDirection="up"
+  ></app-stat-card>
+  <app-stat-card
+    label="Open Deals"
+    [value]="(openDealsCount$ | async) ?? 0"
+    icon="handshake"
+    iconColor="var(--color-stage-proposal)"
+    [trend]="'+' + ((openDealsCount$ | async) ?? 0) + ' active'"
+    trendDirection="neutral"
+  ></app-stat-card>
+  <app-stat-card
+    label="Revenue (Won)"
+    [value]="((wonRevenueSum$ | async) ?? 0) | currencyFormat"
+    icon="payments"
+    iconColor="var(--color-stage-won)"
+    trend="Closed won deals"
+    trendDirection="up"
+  ></app-stat-card>
+  <app-stat-card
+    label="Activities Due Today"
+    [value]="(activitiesDueToday$ | async) ?? 0"
+    icon="event"
+    iconColor="var(--color-warning)"
+    [trend]="((overdueCount$ | async) ?? 0) + ' overdue'"
+    [trendDirection]="((overdueCount$ | async) ?? 0) > 0 ? 'down' : 'neutral'"
+  ></app-stat-card>
+</section>
+
+<section class="dashboard__charts">
+  <article class="dashboard__card">
+    <header class="dashboard__card-header">
+      <h3>Deals by Stage</h3>
+    </header>
+    <div class="dashboard__chart-wrap">
+      @if (doughnutData$ | async; as doughnutData) {
+        <canvas baseChart type="doughnut" [data]="doughnutData" [options]="doughnutOptions"></canvas>
+      }
+    </div>
+    @if (stageSummary$ | async; as summary) {
+      <ul class="dashboard__legend">
+        @for (item of summary; track item.stage) {
+          <li>
+            <span class="dashboard__legend-dot" [style.background]="stageColor(item.stage)"></span>
+            <span class="dashboard__legend-label">{{ stageLabel(item.stage) }}</span>
+            <span class="dashboard__legend-meta">{{ item.count }} · {{ item.value | currencyFormat }}</span>
+          </li>
+        }
+      </ul>
+    }
+  </article>
+
+  <article class="dashboard__card">
+    <header class="dashboard__card-header">
+      <h3>Revenue Over Time</h3>
+      <span class="dashboard__card-sub">Last 6 months (won deals)</span>
+    </header>
+    <div class="dashboard__chart-wrap dashboard__chart-wrap--line">
+      @if (lineData$ | async; as lineData) {
+        <canvas baseChart type="line" [data]="lineData" [options]="lineOptions"></canvas>
+      }
+    </div>
+  </article>
+</section>
+
+<section class="dashboard__bottom">
+  <article class="dashboard__card dashboard__card--feed">
+    <header class="dashboard__card-header">
+      <h3>Recent Activity</h3>
+    </header>
+    <ul class="dashboard__feed">
+      @for (activity of recentActivities$ | async; track activity.id) {
+        <li class="dashboard__feed-item">
+          <span class="dashboard__feed-icon" [style.background]="activityColor(activity.type)">
+            <mat-icon>{{ activityIcon(activity.type) }}</mat-icon>
+          </span>
+          <div class="dashboard__feed-body">
+            <p class="dashboard__feed-title">{{ activity.title }}</p>
+            @if (activity.description) {
+              <p class="dashboard__feed-desc">{{ activity.description }}</p>
+            }
+            <div class="dashboard__feed-meta">
+              @if (activity.contactId && activity.contactName) {
+                <a [routerLink]="['/contacts', activity.contactId]">{{ activity.contactName }}</a>
+              }
+              <span>{{ activity.createdAt | timeAgo }}</span>
+            </div>
+          </div>
+        </li>
+      } @empty {
+        <li class="dashboard__empty">No recent activity</li>
+      }
+    </ul>
+  </article>
+
+  <article class="dashboard__card">
+    <header class="dashboard__card-header">
+      <h3>Top Open Deals</h3>
+    </header>
+    <div class="dashboard__table-wrap">
+      <table class="dashboard__table">
+        <thead>
+          <tr>
+            <th>Deal</th>
+            <th>Contact</th>
+            <th>Stage</th>
+            <th>Value</th>
+            <th>Close</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (deal of topOpenDeals$ | async; track deal.id) {
+            <tr>
+              <td>
+                <a [routerLink]="['/deals', deal.id]" class="dashboard__deal-link">{{ deal.title }}</a>
+              </td>
+              <td>{{ deal.contactName }}</td>
+              <td>
+                <span class="dashboard__stage" [style.--stage-color]="stageColor(deal.stage)">
+                  {{ stageLabel(deal.stage) }}
+                </span>
+              </td>
+              <td>{{ deal.value | currencyFormat }}</td>
+              <td>{{ formatDate(deal.expectedCloseDate) }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="dashboard__empty">No open deals</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>
