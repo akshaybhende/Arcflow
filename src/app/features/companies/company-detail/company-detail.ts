@@ -36,6 +36,7 @@ export class CompanyDetail implements OnInit, OnDestroy {
   readonly stageLabels = STAGE_LABELS;
   readonly stageColors = STAGE_COLORS;
 
+  activeTab = 'Overview';
   company: Company | null = null;
   contacts: Contact[] = [];
   deals: Deal[] = [];

@@ -1,27 +1,27 @@
-.app-layout {
-  height: 100vh;
-}
+.sidebar-container {
+  height: 100%;
+  flex-shrink: 0;
+  transition: width 200ms ease, transform 200ms ease;
+  width: var(--sidebar-width, 240px);
+  z-index: 30;
 
-.app-layout__sidenav {
-  width: var(--sidebar-width);
-  border-right: 1px solid var(--color-border);
-}
+  /* Desktop: always visible via width */
+  &.sidebar-mobile {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    transform: translateX(-100%);
+    width: 240px;
 
-.app-layout__content {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.page-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-6);
-  background: var(--color-bg);
+    &.sidebar-open {
+      transform: translateX(0);
+    }
+  }
 }
 
 @media (max-width: 768px) {
-  .page-content {
-    padding: var(--space-4);
+  main {
+    padding: 1rem !important;
   }
 }

@@ -1,108 +1,175 @@
-<div class="deal-form">
-  <app-page-header
-    [title]="isEditMode ? 'Edit Deal' : 'New Deal'"
-    [subtitle]="isEditMode ? 'Update deal details' : 'Create a new opportunity'"
-  />
+<div class="flex flex-col gap-6">
+  <div class="mb-0">
+    <app-page-header
+      [title]="isEditMode ? 'Edit Deal' : 'New Deal'"
+      [subtitle]="isEditMode ? 'Update deal details' : 'Create a new opportunity'"
+    />
+  </div>
 
-  <form class="deal-form__body" [formGroup]="form" (ngSubmit)="onSubmit()">
-    <section class="deal-form__section">
-      <h2>Deal information</h2>
+  <form class="flex flex-col gap-6" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <section class="rounded-lg border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-4">
+      <h2 class="text-base font-semibold text-foreground">Deal information</h2>
 
-      <mat-form-field appearance="outline" class="deal-form__field">
-        <mat-label>Title</mat-label>
-        <input matInput formControlName="title" />
-        @if (submitted && form.controls.title.invalid) {
-          <mat-error>Title is required</mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="deal-form__field">
-        <mat-label>Contact</mat-label>
+      <!-- Title -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium leading-none" for="df-title">Title</label>
         <input
-          matInput
+          id="df-title"
+          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          formControlName="title"
+          placeholder="Deal title"
+        />
+        @if (submitted && form.controls.title.invalid) {
+          <p class="text-xs text-destructive">Title is required</p>
+        }
+      </div>
+
+      <!-- Contact (with datalist for autocomplete) -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium leading-none" for="df-contact">Contact</label>
+        <input
+          id="df-contact"
+          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           formControlName="contactName"
-          [matAutocomplete]="contactAuto"
+          list="df-contact-list"
           placeholder="Search contacts..."
         />
-        <mat-autocomplete
-          #contactAuto="matAutocomplete"
-          [displayWith]="displayContact"
-          (optionSelected)="onContactSelected($event.option.value)"
-        >
+        <datalist id="df-contact-list">
           @for (contact of filteredContacts$ | async; track contact.id) {
-            <mat-option [value]="contact">
-              {{ contact.firstName }} {{ contact.lastName }} — {{ contact.companyName }}
-            </mat-option>
+            <option [value]="contact.firstName + ' ' + contact.lastName + (contact.companyName ? ' — ' + contact.companyName : '')"></option>
           }
-        </mat-autocomplete>
+        </datalist>
         @if (submitted && form.controls.contactId.invalid) {
-          <mat-error>Contact is required</mat-error>
+          <p class="text-xs text-destructive">Contact is required</p>
         }
-      </mat-form-field>
+      </div>
 
-      <mat-form-field appearance="outline" class="deal-form__field">
-        <mat-label>Company</mat-label>
-        <input matInput formControlName="companyName" />
-      </mat-form-field>
+      <!-- Company -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium leading-none" for="df-company">Company</label>
+        <input
+          id="df-company"
+          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          formControlName="companyName"
+        />
+      </div>
 
-      <div class="deal-form__row">
-        <mat-form-field appearance="outline" class="deal-form__field">
-          <mat-label>Stage</mat-label>
-          <mat-select formControlName="stage">
+      <!-- Stage + Value row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium leading-none" for="df-stage">Stage</label>
+          <select
+            id="df-stage"
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            formControlName="stage"
+          >
             @for (stage of stages; track stage) {
-              <mat-option [value]="stage">{{ stageLabels[stage] }}</mat-option>
+              <option [value]="stage">{{ stageLabels[stage] }}</option>
             }
-          </mat-select>
-        </mat-form-field>
+          </select>
+        </div>
 
-        <mat-form-field appearance="outline" class="deal-form__field deal-form__field--value">
-          <mat-label>Value</mat-label>
-          <span matTextPrefix>$&nbsp;</span>
-          <input matInput type="number" formControlName="value" min="0" />
-        </mat-form-field>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium leading-none" for="df-value">Value</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">$</span>
+            <input
+              id="df-value"
+              class="flex h-10 w-full rounded-md border border-input bg-background pl-6 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              type="number"
+              formControlName="value"
+              min="0"
+            />
+          </div>
+        </div>
       </div>
 
-      <div class="deal-form__row">
-        <div class="deal-form__priority">
-          <label>Priority</label>
-          <mat-radio-group formControlName="priority">
+      <!-- Priority + Probability row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Priority (radio) -->
+        <div class="flex flex-col gap-2">
+          <span class="text-sm font-medium leading-none">Priority</span>
+          <div class="flex items-center gap-4">
             @for (p of priorities; track p) {
-              <mat-radio-button [value]="p">{{ p | titlecase }}</mat-radio-button>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  class="h-4 w-4 accent-primary"
+                  [value]="p"
+                  formControlName="priority"
+                />
+                <span class="text-sm">{{ p | titlecase }}</span>
+              </label>
             }
-          </mat-radio-group>
+          </div>
         </div>
 
-        <div class="deal-form__probability">
-          <label>Probability: {{ form.controls.probability.value }}%</label>
-          <mat-slider min="0" max="100" step="5" discrete>
-            <input matSliderThumb formControlName="probability" />
-          </mat-slider>
+        <!-- Probability (range) -->
+        <div class="flex flex-col gap-2">
+          <span class="text-sm font-medium leading-none">
+            Probability: {{ form.controls.probability.value }}%
+          </span>
+          <input
+            type="range"
+            class="w-full accent-primary"
+            min="0"
+            max="100"
+            step="5"
+            formControlName="probability"
+          />
         </div>
       </div>
 
-      <mat-form-field appearance="outline" class="deal-form__field">
-        <mat-label>Expected close date</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="expectedCloseDate" />
-        <mat-datepicker-toggle matIconSuffix [for]="picker" />
-        <mat-datepicker #picker />
-      </mat-form-field>
+      <!-- Expected close date -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium leading-none" for="df-closeDate">Expected close date</label>
+        <input
+          id="df-closeDate"
+          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          type="date"
+          formControlName="expectedCloseDate"
+        />
+      </div>
 
-      <mat-form-field appearance="outline" class="deal-form__field">
-        <mat-label>Tags</mat-label>
-        <input matInput formControlName="tags" placeholder="Comma-separated tags" />
-      </mat-form-field>
+      <!-- Tags -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium leading-none" for="df-tags">Tags</label>
+        <input
+          id="df-tags"
+          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          formControlName="tags"
+          placeholder="Comma-separated tags"
+        />
+      </div>
 
-      <mat-form-field appearance="outline" class="deal-form__field">
-        <mat-label>Notes</mat-label>
-        <textarea matInput formControlName="notes" rows="4"></textarea>
-      </mat-form-field>
+      <!-- Notes -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium leading-none" for="df-notes">Notes</label>
+        <textarea
+          id="df-notes"
+          class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+          formControlName="notes"
+          rows="4"
+          placeholder="Add notes about this deal..."
+        ></textarea>
+      </div>
     </section>
 
-    <div class="deal-form__actions">
-      <button mat-stroked-button type="button" (click)="onCancel()">Cancel</button>
-      <button mat-flat-button color="primary" type="submit" [disabled]="saving">
+    <!-- Actions -->
+    <div class="flex items-center justify-end gap-3">
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+        (click)="onCancel()"
+      >Cancel</button>
+      <button
+        type="submit"
+        class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        [disabled]="saving"
+      >
         @if (saving) {
-          Saving...
+          <div class="animate-spin rounded-full border-2 border-current border-t-transparent h-4 w-4"></div>
+          Saving…
         } @else {
           {{ isEditMode ? 'Save Deal' : 'Create Deal' }}
         }

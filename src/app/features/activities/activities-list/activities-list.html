@@ -1,89 +1,115 @@
-<app-page-header title="Activities" subtitle="Calls, meetings, and tasks"></app-page-header>
+<div class="mb-6">
+  <app-page-header title="Activities" subtitle="Calls, meetings, and tasks"></app-page-header>
+</div>
 
-<div class="activities-list" [formGroup]="filterForm">
-  <div class="activities-list__toolbar">
-    <mat-form-field appearance="outline" class="activities-list__filter">
-      <mat-label>Type</mat-label>
-      <mat-select formControlName="type">
-        @for (opt of typeOptions; track opt.value) {
-          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+<div class="flex flex-col gap-4" [formGroup]="filterForm">
+  <!-- Toolbar -->
+  <div class="flex flex-wrap items-center gap-3">
+    <!-- Type filter -->
+    <select
+      class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+      formControlName="type"
+    >
+      @for (opt of typeOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
 
-    <mat-form-field appearance="outline" class="activities-list__filter">
-      <mat-label>Status</mat-label>
-      <mat-select formControlName="status">
-        @for (opt of statusOptions; track opt.value) {
-          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+    <!-- Status filter -->
+    <select
+      class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+      formControlName="status"
+    >
+      @for (opt of statusOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
 
-    <mat-form-field appearance="outline" class="activities-list__filter">
-      <mat-label>From</mat-label>
-      <input matInput [matDatepicker]="fromPicker" formControlName="dateFrom" />
-      <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
-      <mat-datepicker #fromPicker></mat-datepicker>
-    </mat-form-field>
+    <!-- Date from -->
+    <div class="flex flex-col gap-1">
+      <label class="text-xs text-muted-foreground sr-only">From</label>
+      <input
+        class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        type="date"
+        formControlName="dateFrom"
+        placeholder="From"
+        title="From date"
+      />
+    </div>
 
-    <mat-form-field appearance="outline" class="activities-list__filter">
-      <mat-label>To</mat-label>
-      <input matInput [matDatepicker]="toPicker" formControlName="dateTo" />
-      <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
-      <mat-datepicker #toPicker></mat-datepicker>
-    </mat-form-field>
+    <!-- Date to -->
+    <div class="flex flex-col gap-1">
+      <label class="text-xs text-muted-foreground sr-only">To</label>
+      <input
+        class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        type="date"
+        formControlName="dateTo"
+        placeholder="To"
+        title="To date"
+      />
+    </div>
 
-    <button mat-flat-button color="primary" class="activities-list__log-btn" type="button" (click)="openLogDialog()">
-      <mat-icon>add</mat-icon>
+    <button
+      type="button"
+      class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors ml-auto"
+      (click)="openLogDialog()"
+    >
+      <span class="material-icons-round text-base">add</span>
       Log Activity
     </button>
   </div>
 
+  <!-- Content -->
   @if (vm$ | async; as vm) {
     @if (vm.loading) {
       <app-loading-spinner></app-loading-spinner>
     } @else {
-      <div class="activities-list__panels">
-        <div class="activities-list__list-panel">
+      <div class="flex flex-col lg:flex-row gap-4 h-full">
+        <!-- List panel -->
+        <div class="flex flex-col flex-1 min-w-0 rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden">
           @if (vm.activities.length === 0) {
-            <app-empty-state
-              icon="event_note"
-              title="No activities found"
-              description="Try adjusting your filters or log a new activity."
-              actionLabel="Log Activity"
-              (action)="openLogDialog()"
-            ></app-empty-state>
+            <div class="p-6">
+              <app-empty-state
+                icon="event_note"
+                title="No activities found"
+                description="Try adjusting your filters or log a new activity."
+                actionLabel="Log Activity"
+                (action)="openLogDialog()"
+              ></app-empty-state>
+            </div>
           } @else {
-            <cdk-virtual-scroll-viewport itemSize="88" class="activities-list__viewport">
-              <ul class="activities-list__rows">
+            <cdk-virtual-scroll-viewport itemSize="88" class="h-[600px]">
+              <ul>
                 <li
                   *cdkVirtualFor="let activity of vm.activities; trackBy: trackById"
-                  class="activities-list__row"
-                  [class.activities-list__row--selected]="isSelected(activity, vm.selected)"
+                  class="flex items-center gap-3 px-4 py-3 border-b border-border cursor-pointer transition-colors hover:bg-muted/50"
+                  [class.bg-muted]="isSelected(activity, vm.selected)"
                   (click)="selectActivity(activity)"
                   (keyup.enter)="selectActivity(activity)"
                   tabindex="0"
                   role="button"
                 >
+                  <!-- Type icon -->
                   <div
-                    class="activities-list__type-icon"
+                    class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
                     [style.background-color]="typeMeta[activity.type].color + '22'"
                   >
-                    <mat-icon [style.color]="typeMeta[activity.type].color">
-                      {{ typeMeta[activity.type].icon }}
-                    </mat-icon>
+                    <span
+                      class="material-icons-round text-xl"
+                      [style.color]="typeMeta[activity.type].color"
+                    >{{ typeMeta[activity.type].icon }}</span>
                   </div>
 
-                  <div class="activities-list__row-body">
-                    <div class="activities-list__row-title">{{ activity.title }}</div>
+                  <!-- Body -->
+                  <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+                    <div class="text-sm font-medium text-foreground truncate">{{ activity.title }}</div>
                     @if (activity.description) {
-                      <div class="activities-list__row-desc">{{ truncate(activity.description) }}</div>
+                      <div class="text-xs text-muted-foreground truncate">{{ truncate(activity.description) }}</div>
                     }
-                    <div class="activities-list__row-meta">
+                    <div class="flex items-center gap-2 text-xs text-muted-foreground">
                       @if (activity.contactName && activity.contactId) {
                         <a
-                          class="activities-list__contact-link"
+                          class="text-primary hover:underline"
                           [routerLink]="['/contacts', activity.contactId]"
                           (click)="$event.stopPropagation()"
                         >
@@ -91,23 +117,23 @@
                         </a>
                       }
                       <span
-                        class="activities-list__due"
-                        [class.activities-list__due--overdue]="isOverdue(activity)"
+                        [class.text-destructive]="isOverdue(activity)"
                       >
                         {{ formatDueDate(activity.dueDate) }}
                       </span>
                     </div>
                   </div>
 
-                  <span class="activities-list__status" [ngClass]="statusClass(activity.status)">
+                  <!-- Status badge -->
+                  <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold flex-shrink-0" [ngClass]="statusClass(activity.status)">
                     {{ statusLabel(activity.status) }}
                   </span>
 
+                  <!-- Complete button -->
                   @if (activity.status === 'pending') {
                     <button
-                      mat-stroked-button
-                      class="activities-list__complete-btn"
                       type="button"
+                      class="inline-flex items-center gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-xs font-medium hover:bg-accent transition-colors flex-shrink-0"
                       (click)="markComplete(activity, $event)"
                     >
                       Mark Complete
@@ -119,88 +145,108 @@
           }
         </div>
 
-        <div class="activities-list__detail-panel">
+        <!-- Detail panel -->
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm lg:w-80 flex-shrink-0">
           @if (vm.selected; as selected) {
-            <div class="activities-list__detail">
-              <div class="activities-list__detail-header">
+            <div class="p-6 flex flex-col gap-4">
+              <!-- Header -->
+              <div class="flex items-start gap-3">
                 <div
-                  class="activities-list__type-icon activities-list__type-icon--lg"
+                  class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full"
                   [style.background-color]="typeMeta[selected.type].color + '22'"
                 >
-                  <mat-icon [style.color]="typeMeta[selected.type].color">
-                    {{ typeMeta[selected.type].icon }}
-                  </mat-icon>
+                  <span
+                    class="material-icons-round text-2xl"
+                    [style.color]="typeMeta[selected.type].color"
+                  >{{ typeMeta[selected.type].icon }}</span>
                 </div>
-                <div>
-                  <h2 class="activities-list__detail-title">{{ selected.title }}</h2>
-                  <span class="activities-list__status" [ngClass]="statusClass(selected.status)">
+                <div class="flex flex-col gap-1 min-w-0">
+                  <h2 class="text-base font-semibold text-foreground leading-tight">{{ selected.title }}</h2>
+                  <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold w-fit" [ngClass]="statusClass(selected.status)">
                     {{ statusLabel(selected.status) }}
                   </span>
                 </div>
               </div>
 
               @if (selected.description) {
-                <p class="activities-list__detail-desc">{{ selected.description }}</p>
+                <p class="text-sm text-muted-foreground">{{ selected.description }}</p>
               }
 
-              <div class="activities-list__detail-meta">
-                <div class="activities-list__meta-item">
-                  <span class="activities-list__meta-label">Due date</span>
-                  <span [class.activities-list__due--overdue]="isOverdue(selected)">
+              <div class="h-px bg-border"></div>
+
+              <!-- Meta -->
+              <div class="flex flex-col gap-3">
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Due date</span>
+                  <span class="text-sm" [class.text-destructive]="isOverdue(selected)">
                     {{ formatDueDate(selected.dueDate) }}
                   </span>
                 </div>
-                <div class="activities-list__meta-item">
-                  <span class="activities-list__meta-label">Owner</span>
-                  <span>{{ selected.owner }}</span>
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Owner</span>
+                  <span class="text-sm text-foreground">{{ selected.owner }}</span>
                 </div>
               </div>
 
               @if (selected.contactName) {
-                <div class="activities-list__contact-card">
+                <div class="h-px bg-border"></div>
+                <div class="flex items-center gap-3">
                   <app-avatar [name]="selected.contactName" size="md"></app-avatar>
                   <div>
                     @if (selected.contactId) {
-                      <a class="activities-list__contact-link" [routerLink]="['/contacts', selected.contactId]">
+                      <a class="text-sm font-medium text-primary hover:underline" [routerLink]="['/contacts', selected.contactId]">
                         {{ selected.contactName }}
                       </a>
                     } @else {
-                      <span>{{ selected.contactName }}</span>
+                      <span class="text-sm font-medium text-foreground">{{ selected.contactName }}</span>
                     }
                   </div>
                 </div>
               }
 
               @if (selected.dealName) {
-                <div class="activities-list__deal">
-                  <mat-icon>handshake</mat-icon>
+                <div class="flex items-center gap-2 text-sm">
+                  <span class="material-icons-round text-base text-muted-foreground">handshake</span>
                   @if (selected.dealId) {
-                    <a [routerLink]="['/deals', selected.dealId]">{{ selected.dealName }}</a>
+                    <a class="text-primary hover:underline" [routerLink]="['/deals', selected.dealId]">{{ selected.dealName }}</a>
                   } @else {
-                    <span>{{ selected.dealName }}</span>
+                    <span class="text-muted-foreground">{{ selected.dealName }}</span>
                   }
                 </div>
               }
 
-              <div class="activities-list__detail-actions">
-                <button mat-stroked-button type="button" (click)="openLogDialog(selected)">
-                  <mat-icon>edit</mat-icon>
+              <div class="h-px bg-border"></div>
+
+              <!-- Actions -->
+              <div class="flex gap-2">
+                <button
+                  type="button"
+                  class="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                  (click)="openLogDialog(selected)"
+                >
+                  <span class="material-icons-round text-base">edit</span>
                   Edit
                 </button>
                 <ng-container *appHasRole="['admin', 'manager']">
-                  <button mat-stroked-button color="warn" type="button" (click)="deleteActivity(selected)">
-                    <mat-icon>delete</mat-icon>
+                  <button
+                    type="button"
+                    class="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-destructive/50 bg-background px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+                    (click)="deleteActivity(selected)"
+                  >
+                    <span class="material-icons-round text-base">delete</span>
                     Delete
                   </button>
                 </ng-container>
               </div>
             </div>
           } @else {
-            <app-empty-state
-              icon="touch_app"
-              title="Select an activity"
-              description="Choose an activity from the list to preview its details."
-            ></app-empty-state>
+            <div class="p-6 flex items-center justify-center h-full">
+              <app-empty-state
+                icon="touch_app"
+                title="Select an activity"
+                description="Choose an activity from the list to preview its details."
+              ></app-empty-state>
+            </div>
           }
         </div>
       </div>

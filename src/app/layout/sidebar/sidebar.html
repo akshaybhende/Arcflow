@@ -1,45 +1,59 @@
-<aside class="sidebar" [class.collapsed]="collapsed$ | async">
-  <div class="sidebar__header">
-    <div class="sidebar__logo">
-      <mat-icon class="sidebar__logo-icon" aria-hidden="true">hub</mat-icon>
-      <span class="sidebar__logo-text">Arcflow</span>
-    </div>
+<aside
+  class="sidebar-root flex h-full flex-col border-r border-border bg-card"
+  [class.w-16]="collapsed$ | async"
+  [class.w-60]="(collapsed$ | async) === false"
+>
+  <!-- Logo -->
+  <div class="flex h-16 items-center gap-3 border-b border-border px-4 shrink-0">
+    <span class="material-icons-round text-primary text-2xl">hub</span>
+    @if ((collapsed$ | async) === false) {
+      <span class="text-lg font-semibold tracking-tight">Arcflow</span>
+    }
   </div>
 
-  <div class="sidebar__user">
-    <app-avatar [src]="currentUser.avatar" [name]="currentUser.name" size="md"></app-avatar>
-    <div class="sidebar__user-info">
-      <span class="sidebar__user-name">{{ currentUser.name }}</span>
-      <span class="sidebar__user-email">{{ currentUser.email }}</span>
+  <!-- User -->
+  @if ((collapsed$ | async) === false) {
+    <div class="flex items-center gap-3 px-4 py-4 border-b border-border">
+      <app-avatar [src]="currentUser.avatar" [name]="currentUser.name" size="sm"></app-avatar>
+      <div class="flex flex-col min-w-0">
+        <span class="text-sm font-medium truncate">{{ currentUser.name }}</span>
+        <span class="text-xs text-muted-foreground truncate">{{ currentUser.email }}</span>
+      </div>
     </div>
-  </div>
+  }
 
-  <nav class="sidebar__nav" aria-label="Main navigation">
+  <!-- Nav -->
+  <nav class="flex flex-1 flex-col gap-1 overflow-y-auto p-2" aria-label="Main navigation">
     @for (item of navItems; track trackByRoute($index, item)) {
       <a
-        class="nav-item"
+        class="nav-item group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
         [routerLink]="item.route"
-        routerLinkActive="active"
+        routerLinkActive="bg-accent text-accent-foreground"
         (click)="onNavClick()"
-        [matTooltip]="item.label"
-        [matTooltipDisabled]="(collapsed$ | async) === true"
-        matTooltipPosition="right"
+        [title]="(collapsed$ | async) ? item.label : ''"
       >
-        <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
-        <span class="nav-label">{{ item.label }}</span>
+        <span class="material-icons-round text-xl shrink-0" aria-hidden="true">{{ item.icon }}</span>
+        @if ((collapsed$ | async) === false) {
+          <span>{{ item.label }}</span>
+        }
       </a>
     }
   </nav>
 
-  <div class="sidebar__footer">
+  <!-- Footer / collapse toggle -->
+  <div class="border-t border-border p-2">
     <button
       type="button"
-      class="sidebar__toggle"
+      class="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
       (click)="onToggleCollapse()"
       [attr.aria-label]="(collapsed$ | async) ? 'Expand sidebar' : 'Collapse sidebar'"
     >
-      <mat-icon>{{ (collapsed$ | async) ? 'chevron_right' : 'chevron_left' }}</mat-icon>
-      <span class="nav-label">{{ (collapsed$ | async) ? 'Expand' : 'Collapse' }}</span>
+      <span class="material-icons-round text-xl shrink-0">
+        {{ (collapsed$ | async) ? 'chevron_right' : 'chevron_left' }}
+      </span>
+      @if ((collapsed$ | async) === false) {
+        <span>Collapse</span>
+      }
     </button>
   </div>
 </aside>

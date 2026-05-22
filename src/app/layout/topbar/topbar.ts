@@ -51,6 +51,7 @@ export class Topbar {
   readonly pageTitle$: Observable<string>;
 
   searchQuery = '';
+  userMenuOpen = false;
 
   constructor() {
     this.currentUser$ = this.authService.getCurrentUser();

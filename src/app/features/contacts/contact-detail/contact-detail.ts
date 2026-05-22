@@ -76,6 +76,7 @@ export class ContactDetail implements OnInit {
   private readonly notification = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
 
+  activeTab = 'overview';
   readonly notesControl = new FormControl('');
   readonly loading$ = this.store.select(selectContactsLoading);
   readonly statusLabels = CONTACT_STATUS_LABELS;

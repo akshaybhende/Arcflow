@@ -31,6 +31,7 @@ export class DealDetail implements OnInit, OnDestroy {
   readonly stageLabels = STAGE_LABELS;
   readonly stageColors = STAGE_COLORS;
 
+  activeTab = 'Overview';
   deal: Deal | null = null;
   contact: Contact | null = null;
   activities: Activity[] = [];

@@ -95,8 +95,13 @@ export const selectOpenDealsCount = createSelector(
   (deals) => deals.filter((d) => d.stage !== 'won' && d.stage !== 'lost').length,
 );
 
-export const selectPipelineValue = createSelector(selectFilteredDeals, (deals) =>
+export const selectPipelineValue = createSelector(selectAllDeals, (deals) =>
   deals.filter((d) => d.stage !== 'won' && d.stage !== 'lost').reduce((sum, d) => sum + d.value, 0),
+);
+
+export const selectWonDealsCount = createSelector(
+  selectAllDeals,
+  (deals) => deals.filter((d) => d.stage === 'won').length,
 );
 
 export const selectDealsByStage = createSelector(selectFilteredDeals, (deals) => {
@@ -135,7 +140,7 @@ export const selectTopOpenDeals = createSelector(selectAllDeals, (deals) =>
   [...deals]
     .filter((d) => d.stage !== 'won' && d.stage !== 'lost')
     .sort((a, b) => b.value - a.value)
-    .slice(0, 5),
+    .slice(0, 10),
 );
 
 export const selectMonthlyWonRevenue = createSelector(selectAllDeals, (deals) => {
