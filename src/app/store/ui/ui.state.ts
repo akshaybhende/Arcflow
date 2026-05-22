@@ -11,6 +11,7 @@ export interface Notification {
 export interface UiState {
   theme: AppTheme;
   sidebarCollapsed: boolean;
+  mobileSidebarOpen: boolean;
   globalLoading: boolean;
   notifications: Notification[];
 }
@@ -18,6 +19,7 @@ export interface UiState {
 export const initialUiState: UiState = {
   theme: 'light',
   sidebarCollapsed: false,
+  mobileSidebarOpen: false,
   globalLoading: false,
   notifications: [],
 };

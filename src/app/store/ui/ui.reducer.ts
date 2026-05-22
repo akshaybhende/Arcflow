@@ -12,6 +12,14 @@ export const uiReducer = createReducer(
     ...state,
     sidebarCollapsed: collapsed,
   })),
+  on(UiActions.setMobileSidebarOpen, (state, { open }): UiState => ({
+    ...state,
+    mobileSidebarOpen: open,
+  })),
+  on(UiActions.toggleMobileSidebar, (state): UiState => ({
+    ...state,
+    mobileSidebarOpen: !state.mobileSidebarOpen,
+  })),
   on(UiActions.setTheme, (state, { theme }): UiState => ({
     ...state,
     theme,

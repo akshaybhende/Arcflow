@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject } from '@
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable, Subject, combineLatest, map, startWith, takeUntil } from 'rxjs';
+import { Observable, Subject, combineLatest, filter, map, startWith, take, takeUntil } from 'rxjs';
 import { Contact, Deal, DealPriority, DealStage } from '../../../core/models';
 import { loadContacts } from '../../../store/contacts/contacts.actions';
 import { selectAllContacts } from '../../../store/contacts/contacts.selectors';
@@ -88,8 +88,39 @@ export class DealForm implements OnInit, OnDestroy {
               this.patchForm(deal);
             }
           });
+      } else {
+        this.applyQueryParamContact();
       }
     });
+  }
+
+  private applyQueryParamContact(): void {
+    const contactId = this.route.snapshot.queryParamMap.get('contactId');
+    if (!contactId) {
+      return;
+    }
+
+    const contactName = this.route.snapshot.queryParamMap.get('contactName') ?? '';
+    const companyName = this.route.snapshot.queryParamMap.get('companyName') ?? '';
+
+    this.contacts$
+      .pipe(
+        filter((contacts) => contacts.length > 0),
+        take(1),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((contacts) => {
+        const contact = contacts.find((c) => c.id === contactId);
+        if (contact) {
+          this.onContactSelected(contact);
+          return;
+        }
+        this.form.patchValue({
+          contactId,
+          contactName,
+          companyName,
+        });
+      });
   }
 
   ngOnDestroy(): void {

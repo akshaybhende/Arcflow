@@ -68,7 +68,7 @@ export class DealsPage implements OnInit {
 
     this.searchControl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
-      .subscribe((search) => this.applyFilters());
+      .subscribe(() => this.applyFilters());
 
     this.stageFilter.valueChanges.subscribe(() => this.applyFilters());
     this.ownerFilter.valueChanges.subscribe(() => this.applyFilters());

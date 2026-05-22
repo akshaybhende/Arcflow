@@ -1,85 +1,104 @@
-<div class="deals-page">
-  <div class="deals-page__header">
+<div class="flex flex-col gap-4">
+  <!-- Header -->
+  <div class="flex items-start justify-between gap-4 flex-wrap">
     <div>
-      <app-page-header title="Deals" />
+      <div class="mb-0">
+        <app-page-header title="Deals" />
+      </div>
       @if (pipelineValue$ | async; as pipeline) {
-        <p class="deals-page__pipeline">Pipeline: {{ pipeline | currencyFormat }}</p>
+        <p class="text-sm text-muted-foreground">Pipeline: {{ pipeline | currencyFormat }}</p>
       }
     </div>
-    <div class="deals-page__header-actions">
-      <button mat-flat-button color="primary" type="button" (click)="navigateToNew()">
-        <mat-icon>add</mat-icon>
-        Add Deal
+    <button
+      type="button"
+      class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+      (click)="navigateToNew()"
+    >
+      <span class="material-icons-round text-base">add</span>
+      Add Deal
+    </button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="flex flex-wrap items-center gap-3">
+    <!-- Search -->
+    <div class="relative flex-1 min-w-[200px]">
+      <span class="material-icons-round text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 text-base pointer-events-none">search</span>
+      <input
+        class="flex h-10 w-full rounded-md border border-input bg-background pl-9 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        [formControl]="searchControl"
+        placeholder="Title, contact, company..."
+      />
+    </div>
+
+    <!-- Stage filter -->
+    <select
+      class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+      [formControl]="stageFilter"
+    >
+      <option value="all">All stages</option>
+      @for (stage of stages; track stage) {
+        <option [value]="stage">{{ stageLabels[stage] }}</option>
+      }
+    </select>
+
+    <!-- Owner filter -->
+    <select
+      class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+      [formControl]="ownerFilter"
+    >
+      @for (owner of owners$ | async; track owner) {
+        <option [value]="owner">{{ owner === 'all' ? 'All owners' : owner }}</option>
+      }
+    </select>
+
+    <!-- View toggle -->
+    <div class="flex rounded-md border border-input overflow-hidden" role="group" aria-label="View mode">
+      <button
+        type="button"
+        class="inline-flex h-10 items-center gap-1.5 px-3 text-sm font-medium transition-colors"
+        [class]="viewMode === 'kanban' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
+        (click)="setViewMode('kanban')"
+      >
+        <span class="material-icons-round text-base">view_kanban</span>
+        Kanban
+      </button>
+      <button
+        type="button"
+        class="inline-flex h-10 items-center gap-1.5 px-3 text-sm font-medium border-l border-input transition-colors"
+        [class]="viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
+        (click)="setViewMode('list')"
+      >
+        <span class="material-icons-round text-base">view_list</span>
+        List
       </button>
     </div>
   </div>
 
-  <div class="deals-page__toolbar">
-    <mat-form-field appearance="outline" class="deals-page__search">
-      <mat-label>Search deals</mat-label>
-      <mat-icon matPrefix>search</mat-icon>
-      <input matInput [formControl]="searchControl" placeholder="Title, contact, company..." />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="deals-page__filter">
-      <mat-label>Stage</mat-label>
-      <mat-select [formControl]="stageFilter">
-        <mat-option value="all">All stages</mat-option>
-        @for (stage of stages; track stage) {
-          <mat-option [value]="stage">{{ stageLabels[stage] }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="deals-page__filter">
-      <mat-label>Owner</mat-label>
-      <mat-select [formControl]="ownerFilter">
-        @for (owner of owners$ | async; track owner) {
-          <mat-option [value]="owner">{{ owner === 'all' ? 'All owners' : owner }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-button-toggle-group
-      class="deals-page__view-toggle"
-      [value]="viewMode"
-      (change)="setViewMode($event.value)"
-    >
-      <mat-button-toggle value="kanban">
-        <mat-icon>view_kanban</mat-icon>
-        Kanban
-      </mat-button-toggle>
-      <mat-button-toggle value="list">
-        <mat-icon>view_list</mat-icon>
-        List
-      </mat-button-toggle>
-    </mat-button-toggle-group>
-  </div>
-
+  <!-- Content -->
   @if (loading$ | async) {
     <app-loading-spinner />
   } @else if (viewMode === 'kanban') {
     @if (dealsByStage$ | async; as dealsByStage) {
-      <div class="deals-kanban" cdkDropListGroup>
+      <!-- Kanban board -->
+      <div class="flex gap-4 overflow-x-auto pb-2" cdkDropListGroup>
         @for (stage of stages; track stage) {
-          <div
-            class="deals-kanban__column"
-            [class.deals-kanban__column--won]="stage === 'won'"
-            [class.deals-kanban__column--lost]="stage === 'lost'"
-          >
+          <div class="flex flex-col gap-3 rounded-lg bg-muted/50 p-3 min-h-[200px] w-72 flex-shrink-0">
+            <!-- Column header -->
             <div
-              class="deals-kanban__header"
-              [style.border-top-color]="stageColors[stage]"
+              class="flex items-center justify-between pb-2 border-b-2"
+              [style.border-bottom-color]="stageColors[stage]"
             >
-              <h3 class="deals-kanban__title">{{ stageLabels[stage] }}</h3>
-              <div class="deals-kanban__meta">
-                <span>{{ dealsByStage[stage].length }} deals</span>
-                <span class="deals-kanban__value">{{ columnTotal(dealsByStage[stage]) | currencyFormat }}</span>
+              <h3 class="text-sm font-semibold text-foreground">{{ stageLabels[stage] }}</h3>
+              <div class="flex items-center gap-2 text-xs text-muted-foreground">
+                <span>{{ dealsByStage[stage].length }}</span>
+                <span class="font-medium">{{ columnTotal(dealsByStage[stage]) | currencyFormat }}</span>
               </div>
             </div>
 
+            <!-- Drop list -->
             <div
-              class="deals-kanban__list"
+              class="flex flex-col gap-2 flex-1"
               cdkDropList
               [id]="stage"
               [cdkDropListData]="dealsByStage[stage]"
@@ -87,34 +106,36 @@
             >
               @for (deal of dealsByStage[stage]; track deal.id) {
                 <article
-                  class="deal-card"
+                  class="rounded-lg border bg-card p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                  [class.opacity-75]="stage === 'lost'"
                   cdkDrag
                   [cdkDragData]="deal"
-                  [class.deal-card--won]="stage === 'won'"
-                  [class.deal-card--lost]="stage === 'lost'"
                   (click)="navigateToDeal(deal.id)"
                 >
-                  <h4 class="deal-card__title">{{ deal.title }}</h4>
-                  <p class="deal-card__contact">
+                  <h4 class="text-sm font-semibold text-foreground mb-1">{{ deal.title }}</h4>
+                  <p class="text-xs text-muted-foreground mb-3">
                     {{ deal.contactName }}
                     @if (deal.companyName) {
                       <span> · {{ deal.companyName }}</span>
                     }
                   </p>
-                  <div class="deal-card__footer">
-                    <span class="deal-card__value">{{ deal.value | currencyFormat }}</span>
-                    <span
-                      class="deal-card__priority"
-                      [style.background-color]="priorityColors[deal.priority]"
-                      [attr.title]="deal.priority"
-                    ></span>
-                    <span
-                      class="deal-card__date"
-                      [class.deal-card__date--overdue]="isOverdue(deal.expectedCloseDate)"
-                    >
-                      {{ formatCloseDate(deal.expectedCloseDate) }}
-                    </span>
-                    <app-avatar [name]="deal.owner" size="sm" />
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-sm font-semibold text-foreground">{{ deal.value | currencyFormat }}</span>
+                    <div class="flex items-center gap-2">
+                      <span
+                        class="h-2 w-2 rounded-full flex-shrink-0"
+                        [style.background-color]="priorityColors[deal.priority]"
+                        [title]="deal.priority"
+                      ></span>
+                      <span
+                        class="text-xs"
+                        [class.text-destructive]="isOverdue(deal.expectedCloseDate)"
+                        [class.text-muted-foreground]="!isOverdue(deal.expectedCloseDate)"
+                      >
+                        {{ formatCloseDate(deal.expectedCloseDate) }}
+                      </span>
+                      <app-avatar [name]="deal.owner" size="sm" />
+                    </div>
                   </div>
                 </article>
               }
@@ -124,86 +145,102 @@
       </div>
     }
   } @else {
-    <div class="deals-list">
-      <table mat-table [dataSource]="dataSource" class="deals-list__table">
-        <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef>Title</th>
-          <td mat-cell *matCellDef="let deal">
-            <a class="deals-list__link" [routerLink]="['/deals', deal.id]">{{ deal.title }}</a>
-          </td>
-        </ng-container>
+    <!-- List view -->
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="dataSource" class="w-full">
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef class="h-12 px-4 text-left text-sm font-medium text-muted-foreground">Title</th>
+            <td mat-cell *matCellDef="let deal" class="p-4 text-sm">
+              <a class="font-medium text-primary hover:underline" [routerLink]="['/deals', deal.id]">{{ deal.title }}</a>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="contact">
-          <th mat-header-cell *matHeaderCellDef>Contact</th>
-          <td mat-cell *matCellDef="let deal">{{ deal.contactName }}</td>
-        </ng-container>
+          <ng-container matColumnDef="contact">
+            <th mat-header-cell *matHeaderCellDef class="h-12 px-4 text-left text-sm font-medium text-muted-foreground">Contact</th>
+            <td mat-cell *matCellDef="let deal" class="p-4 text-sm text-muted-foreground">{{ deal.contactName }}</td>
+          </ng-container>
 
-        <ng-container matColumnDef="company">
-          <th mat-header-cell *matHeaderCellDef>Company</th>
-          <td mat-cell *matCellDef="let deal">{{ deal.companyName || '—' }}</td>
-        </ng-container>
+          <ng-container matColumnDef="company">
+            <th mat-header-cell *matHeaderCellDef class="h-12 px-4 text-left text-sm font-medium text-muted-foreground">Company</th>
+            <td mat-cell *matCellDef="let deal" class="p-4 text-sm text-muted-foreground">{{ deal.companyName || '—' }}</td>
+          </ng-container>
 
-        <ng-container matColumnDef="stage">
-          <th mat-header-cell *matHeaderCellDef>Stage</th>
-          <td mat-cell *matCellDef="let deal">
-            <span
-              class="deals-list__badge"
-              [style.background-color]="stageColor(deal.stage)"
-            >
-              {{ stageLabel(deal.stage) }}
-            </span>
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="stage">
+            <th mat-header-cell *matHeaderCellDef class="h-12 px-4 text-left text-sm font-medium text-muted-foreground">Stage</th>
+            <td mat-cell *matCellDef="let deal" class="p-4 text-sm">
+              <span
+                class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                [style.background-color]="stageColor(deal.stage) + '22'"
+                [style.color]="stageColor(deal.stage)"
+              >
+                {{ stageLabel(deal.stage) }}
+              </span>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="value">
-          <th mat-header-cell *matHeaderCellDef>Value</th>
-          <td mat-cell *matCellDef="let deal">{{ deal.value | currencyFormat }}</td>
-        </ng-container>
+          <ng-container matColumnDef="value">
+            <th mat-header-cell *matHeaderCellDef class="h-12 px-4 text-left text-sm font-medium text-muted-foreground">Value</th>
+            <td mat-cell *matCellDef="let deal" class="p-4 text-sm font-medium">{{ deal.value | currencyFormat }}</td>
+          </ng-container>
 
-        <ng-container matColumnDef="priority">
-          <th mat-header-cell *matHeaderCellDef>Priority</th>
-          <td mat-cell *matCellDef="let deal">
-            <span
-              class="deal-card__priority"
-              [style.background-color]="priorityColor(deal.priority)"
-            ></span>
-            {{ deal.priority }}
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="priority">
+            <th mat-header-cell *matHeaderCellDef class="h-12 px-4 text-left text-sm font-medium text-muted-foreground">Priority</th>
+            <td mat-cell *matCellDef="let deal" class="p-4 text-sm">
+              <div class="flex items-center gap-2">
+                <span class="h-2 w-2 rounded-full" [style.background-color]="priorityColor(deal.priority)"></span>
+                <span class="text-muted-foreground">{{ deal.priority }}</span>
+              </div>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="closeDate">
-          <th mat-header-cell *matHeaderCellDef>Close Date</th>
-          <td mat-cell *matCellDef="let deal">{{ formatCloseDate(deal.expectedCloseDate) }}</td>
-        </ng-container>
+          <ng-container matColumnDef="closeDate">
+            <th mat-header-cell *matHeaderCellDef class="h-12 px-4 text-left text-sm font-medium text-muted-foreground">Close Date</th>
+            <td mat-cell *matCellDef="let deal" class="p-4 text-sm text-muted-foreground">{{ formatCloseDate(deal.expectedCloseDate) }}</td>
+          </ng-container>
 
-        <ng-container matColumnDef="owner">
-          <th mat-header-cell *matHeaderCellDef>Owner</th>
-          <td mat-cell *matCellDef="let deal">
-            <app-avatar [name]="deal.owner" size="sm" />
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="owner">
+            <th mat-header-cell *matHeaderCellDef class="h-12 px-4 text-left text-sm font-medium text-muted-foreground">Owner</th>
+            <td mat-cell *matCellDef="let deal" class="p-4 text-sm">
+              <app-avatar [name]="deal.owner" size="sm" />
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef></th>
-          <td mat-cell *matCellDef="let deal">
-            <button mat-icon-button type="button" [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">
-              <button mat-menu-item type="button" [routerLink]="['/deals', deal.id]">View</button>
-              <button mat-menu-item type="button" (click)="navigateToEdit(deal.id, $event)">Edit</button>
-            </mat-menu>
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="h-12 px-4"></th>
+            <td mat-cell *matCellDef="let deal" class="p-4 text-sm">
+              <div class="relative">
+                <button
+                  type="button"
+                  class="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                  (click)="$event.stopPropagation(); deal._menuOpen = !deal._menuOpen"
+                >
+                  <span class="material-icons-round text-xl">more_vert</span>
+                </button>
+                @if (deal._menuOpen) {
+                  <div class="absolute right-0 top-10 z-50 min-w-[120px] rounded-md border bg-popover shadow-md py-1"
+                    (click)="deal._menuOpen = false">
+                    <button type="button"
+                      class="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent"
+                      [routerLink]="['/deals', deal.id]">View</button>
+                    <button type="button"
+                      class="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent"
+                      (click)="navigateToEdit(deal.id, $event)">Edit</button>
+                  </div>
+                }
+              </div>
+            </td>
+          </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="listColumns"></tr>
-        <tr
-          mat-row
-          *matRowDef="let row; columns: listColumns"
-          class="deals-list__row"
-          [routerLink]="['/deals', row.id]"
-        ></tr>
-      </table>
+          <tr mat-header-row *matHeaderRowDef="listColumns" class="border-b border-border"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: listColumns"
+            class="border-b border-border transition-colors hover:bg-muted/50 cursor-pointer"
+            [routerLink]="['/deals', row.id]"
+          ></tr>
+        </table>
+      </div>
 
       @if (!dataSource.data.length) {
         <app-empty-state

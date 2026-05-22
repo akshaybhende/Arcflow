@@ -1,66 +1,116 @@
-<header class="topbar">
+<header class="flex h-16 shrink-0 items-center border-b border-border bg-card px-4 gap-4 relative">
+  <!-- Loading bar -->
   @if (globalLoading$ | async) {
-    <mat-progress-bar class="topbar__progress" mode="indeterminate"></mat-progress-bar>
+    <div class="absolute top-0 left-0 right-0 h-0.5 bg-primary/20">
+      <div class="h-full bg-primary animate-[loading_1.5s_ease-in-out_infinite]"></div>
+    </div>
   }
 
-  <div class="topbar__inner">
-    <h2 class="topbar__title">{{ pageTitle$ | async }}</h2>
+  <!-- Mobile menu button -->
+  @if (showMenu) {
+    <button
+      type="button"
+      class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+      (click)="onMenuClick()"
+      aria-label="Open navigation menu"
+    >
+      <span class="material-icons-round text-xl">menu</span>
+    </button>
+  }
 
-    <div class="topbar__search">
-      <mat-icon class="topbar__search-icon" aria-hidden="true">search</mat-icon>
-      <input
-        type="search"
-        class="topbar__search-input"
-        placeholder="Search contacts, deals..."
-        [(ngModel)]="searchQuery"
-        aria-label="Global search"
-      />
-    </div>
+  <!-- Page title -->
+  <h2 class="text-lg font-semibold tracking-tight flex-1 truncate">{{ pageTitle$ | async }}</h2>
 
-    <div class="topbar__actions">
-      <button
-        mat-icon-button
-        type="button"
-        (click)="onToggleTheme()"
-        [attr.aria-label]="(theme$ | async) === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-      >
-        <mat-icon>{{ (theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
-      </button>
+  <!-- Search -->
+  <div class="relative hidden sm:flex items-center">
+    <span class="material-icons-round absolute left-3 text-lg text-muted-foreground pointer-events-none">search</span>
+    <input
+      type="search"
+      class="h-9 w-64 rounded-md border border-input bg-background pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      placeholder="Search contacts, deals..."
+      [(ngModel)]="searchQuery"
+      aria-label="Global search"
+    />
+  </div>
 
-      <button mat-icon-button type="button" aria-label="Notifications">
-        <mat-icon
-          [matBadge]="(unreadCount$ | async) || null"
-          [matBadgeHidden]="!(unreadCount$ | async)"
-          matBadgeColor="warn"
-          matBadgeSize="small"
-        >
-          notifications
-        </mat-icon>
-      </button>
+  <!-- Actions -->
+  <div class="flex items-center gap-1">
+    <!-- Theme toggle -->
+    <button
+      type="button"
+      class="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+      (click)="onToggleTheme()"
+      [attr.aria-label]="(theme$ | async) === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+    >
+      <span class="material-icons-round text-xl">
+        {{ (theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}
+      </span>
+    </button>
 
-      @if (currentUser$ | async; as user) {
-        <button mat-button [matMenuTriggerFor]="userMenu" class="topbar__user-btn" type="button">
-          <app-avatar [src]="user.avatar" [name]="user.name" size="sm"></app-avatar>
-          <span class="topbar__user-name">{{ user.name }}</span>
-          <mat-icon>expand_more</mat-icon>
-        </button>
+    <!-- Notifications -->
+    <button
+      type="button"
+      class="relative inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+      aria-label="Notifications"
+    >
+      <span class="material-icons-round text-xl">notifications</span>
+      @if ((unreadCount$ | async) ?? 0 > 0) {
+        <span class="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+          {{ unreadCount$ | async }}
+        </span>
       }
+    </button>
 
-      <mat-menu #userMenu="matMenu" xPosition="before">
-        <button mat-menu-item type="button" routerLink="/settings">
-          <mat-icon>person</mat-icon>
-          <span>Profile</span>
+    <!-- User menu -->
+    @if (currentUser$ | async; as user) {
+      <div class="relative" appClickOutside (appClickOutside)="userMenuOpen = false">
+        <button
+          type="button"
+          class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+          (click)="userMenuOpen = !userMenuOpen"
+          [attr.aria-expanded]="userMenuOpen"
+        >
+          <app-avatar [src]="user.avatar" [name]="user.name" size="sm"></app-avatar>
+          <span class="hidden md:inline truncate max-w-[120px]">{{ user.name }}</span>
+          <span class="material-icons-round text-base text-muted-foreground">expand_more</span>
         </button>
-        <button mat-menu-item type="button" routerLink="/settings">
-          <mat-icon>settings</mat-icon>
-          <span>Settings</span>
-        </button>
-        <mat-divider></mat-divider>
-        <button mat-menu-item type="button" (click)="onLogout()">
-          <mat-icon>logout</mat-icon>
-          <span>Logout</span>
-        </button>
-      </mat-menu>
-    </div>
+
+        @if (userMenuOpen) {
+          <div
+            class="absolute right-0 top-full mt-1 w-48 rounded-md border border-border bg-popover p-1 shadow-md z-50"
+            role="menu"
+          >
+            <a
+              routerLink="/settings"
+              class="flex items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent cursor-pointer"
+              role="menuitem"
+              (click)="userMenuOpen = false"
+            >
+              <span class="material-icons-round text-base">person</span>
+              Profile
+            </a>
+            <a
+              routerLink="/settings"
+              class="flex items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent cursor-pointer"
+              role="menuitem"
+              (click)="userMenuOpen = false"
+            >
+              <span class="material-icons-round text-base">settings</span>
+              Settings
+            </a>
+            <div class="my-1 h-px bg-border"></div>
+            <button
+              type="button"
+              class="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm text-destructive hover:bg-accent cursor-pointer"
+              role="menuitem"
+              (click)="onLogout(); userMenuOpen = false"
+            >
+              <span class="material-icons-round text-base">logout</span>
+              Logout
+            </button>
+          </div>
+        }
+      </div>
+    }
   </div>
 </header>

@@ -1,32 +1,68 @@
-<section class="settings-section">
-  <h2 class="settings-section__title">Profile</h2>
-  <p class="settings-section__desc">Update your personal information and avatar.</p>
+<section class="rounded-lg border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-6">
+  <div>
+    <h2 class="text-base font-semibold text-foreground">Profile</h2>
+    <p class="text-sm text-muted-foreground mt-1">Update your personal information and avatar.</p>
+  </div>
 
-  <form [formGroup]="form" class="settings-section__form" (ngSubmit)="onSave()">
-    <div class="settings-profile__avatar-row">
+  <div class="h-px bg-border"></div>
+
+  <form [formGroup]="form" class="flex flex-col gap-5" (ngSubmit)="onSave()">
+    <!-- Avatar row -->
+    <div class="flex items-center gap-4">
       <app-avatar [src]="avatarPreview ?? undefined" [name]="form.controls.name.value" size="xl"></app-avatar>
-      <div>
-        <input #avatarInput type="file" accept="image/*" hidden (change)="onAvatarSelected($event)" />
-        <button mat-stroked-button type="button" (click)="avatarInput.click()">Upload photo</button>
-        <p class="settings-section__hint">Preview only — not uploaded to a server.</p>
+      <div class="flex flex-col gap-1.5">
+        <input #avatarInput type="file" accept="image/*" class="hidden" (change)="onAvatarSelected($event)" />
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+          (click)="avatarInput.click()"
+        >
+          <span class="material-icons-round text-base">upload</span>
+          Upload photo
+        </button>
+        <p class="text-xs text-muted-foreground">Preview only — not uploaded to a server.</p>
       </div>
     </div>
 
-    <mat-form-field appearance="outline" class="settings-section__field">
-      <mat-label>Name</mat-label>
-      <input matInput formControlName="name" />
-    </mat-form-field>
+    <!-- Name -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium leading-none" for="sp-name">Name</label>
+      <input
+        id="sp-name"
+        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        formControlName="name"
+        placeholder="Your full name"
+      />
+    </div>
 
-    <mat-form-field appearance="outline" class="settings-section__field">
-      <mat-label>Email</mat-label>
-      <input matInput type="email" formControlName="email" />
-    </mat-form-field>
+    <!-- Email -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium leading-none" for="sp-email">Email</label>
+      <input
+        id="sp-email"
+        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        type="email"
+        formControlName="email"
+        placeholder="you@example.com"
+      />
+    </div>
 
-    <mat-form-field appearance="outline" class="settings-section__field">
-      <mat-label>Department</mat-label>
-      <input matInput formControlName="department" />
-    </mat-form-field>
+    <!-- Department -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium leading-none" for="sp-dept">Department</label>
+      <input
+        id="sp-dept"
+        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        formControlName="department"
+        placeholder="e.g. Sales"
+      />
+    </div>
 
-    <button mat-flat-button color="primary" type="submit">Save</button>
+    <div>
+      <button
+        type="submit"
+        class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+      >Save</button>
+    </div>
   </form>
 </section>

@@ -3,6 +3,13 @@ import { AppTheme } from './ui.state';
 
 export const toggleSidebar = createAction('[UI] Toggle Sidebar');
 
+export const setMobileSidebarOpen = createAction(
+  '[UI] Set Mobile Sidebar Open',
+  props<{ open: boolean }>(),
+);
+
+export const toggleMobileSidebar = createAction('[UI] Toggle Mobile Sidebar');
+
 export const setSidebarCollapsed = createAction(
   '[UI] Set Sidebar Collapsed',
   props<{ collapsed: boolean }>(),

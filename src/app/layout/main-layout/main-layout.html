@@ -1,8 +1,26 @@
-<div class="app-layout" [class.sidebar-collapsed]="sidebarCollapsed$ | async">
-  <app-sidebar></app-sidebar>
-  <div class="main-content">
-    <app-topbar></app-topbar>
-    <main class="page-content">
+<div class="flex h-screen overflow-hidden bg-background">
+  <!-- Mobile overlay backdrop -->
+  @if ((isHandset$ | async) && (mobileSidebarOpen$ | async)) {
+    <div
+      class="fixed inset-0 z-20 bg-black/50 lg:hidden"
+      (click)="onSidenavClosed()"
+      aria-hidden="true"
+    ></div>
+  }
+
+  <!-- Sidebar -->
+  <div
+    class="sidebar-container"
+    [class.sidebar-open]="(isHandset$ | async) ? (mobileSidebarOpen$ | async) : true"
+    [class.sidebar-mobile]="isHandset$ | async"
+  >
+    <app-sidebar (navigate)="onSidebarNavigate()"></app-sidebar>
+  </div>
+
+  <!-- Main content -->
+  <div class="flex flex-1 flex-col min-w-0 overflow-hidden">
+    <app-topbar [showMenu]="(isHandset$ | async) ?? false" (menuToggle)="onMenuToggle()"></app-topbar>
+    <main class="flex-1 overflow-y-auto p-6 lg:p-8 bg-background">
       <router-outlet></router-outlet>
     </main>
   </div>

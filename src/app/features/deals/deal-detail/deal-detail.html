@@ -1,136 +1,147 @@
 @if (deal) {
-  <div class="deal-detail">
-    <nav class="deal-detail__breadcrumb">
-      <a routerLink="/deals">Deals</a>
-      <mat-icon>chevron_right</mat-icon>
-      <span>{{ deal.title }}</span>
+  <div class="space-y-6">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-1 text-sm text-muted-foreground">
+      <a routerLink="/deals" class="hover:text-foreground no-underline">Deals</a>
+      <span class="material-icons-round text-base">chevron_right</span>
+      <span class="text-foreground font-medium">{{ deal.title }}</span>
     </nav>
 
-    <div class="deal-detail__layout">
-      <aside class="deal-detail__sidebar">
-        <h2 class="deal-detail__title">{{ deal.title }}</h2>
-        <p class="deal-detail__value">{{ deal.value | currencyFormat }}</p>
-
-        <span
-          class="deal-detail__stage"
-          [style.background-color]="stageColors[deal.stage]"
-        >
-          {{ stageLabels[deal.stage] }}
-        </span>
-
-        <div class="deal-detail__probability">
-          <label>Probability: {{ deal.probability }}%</label>
-          <mat-slider
-            min="0"
-            max="100"
-            step="5"
-            showTickMarks
-            discrete
-            [displayWith]="formatProbability"
-          >
+    <div class="flex gap-6 flex-col lg:flex-row">
+      <!-- Sidebar -->
+      <aside class="w-full lg:w-72 shrink-0 flex flex-col gap-4">
+        <div class="rounded-lg border bg-card p-6 flex flex-col gap-4">
+          <div>
+            <h2 class="text-xl font-semibold">{{ deal.title }}</h2>
+            <p class="text-2xl font-bold text-primary mt-1">{{ deal.value | currencyFormat }}</p>
+          </div>
+          <span class="inline-flex self-start items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-secondary text-secondary-foreground">
+            {{ stageLabels[deal.stage] }}
+          </span>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-medium text-muted-foreground">Probability: {{ deal.probability }}%</label>
             <input
-              matSliderThumb
+              type="range" min="0" max="100" step="5"
               [value]="deal.probability"
-              (valueChange)="onProbabilityChange($event)"
+              (input)="onProbabilityChange(+$any($event.target).value)"
+              class="w-full accent-primary"
             />
-          </mat-slider>
-        </div>
-
-        <div class="deal-detail__actions">
-          <button mat-stroked-button type="button" (click)="navigateToEdit()">Edit</button>
-          <button mat-stroked-button color="warn" type="button" (click)="confirmDelete()">Delete</button>
+          </div>
+          <div class="flex gap-2 pt-2 border-t border-border">
+            <button
+              type="button"
+              class="flex-1 inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-accent transition-colors"
+              (click)="navigateToEdit()"
+            >Edit</button>
+            <ng-container *appHasRole="['admin', 'manager']">
+              <button
+                type="button"
+                class="flex-1 inline-flex items-center justify-center rounded-md border border-destructive text-destructive px-3 py-2 text-sm font-medium hover:bg-destructive/10 transition-colors"
+                (click)="confirmDelete()"
+              >Delete</button>
+            </ng-container>
+          </div>
         </div>
       </aside>
 
-      <section class="deal-detail__main">
-        <mat-tab-group>
-          <mat-tab label="Overview">
-            <div class="deal-detail__tab">
-              <dl class="deal-detail__meta">
-                <dt>Owner</dt>
-                <dd>{{ deal.owner }}</dd>
-                <dt>Priority</dt>
-                <dd class="deal-detail__priority">{{ deal.priority }}</dd>
-                <dt>Expected close</dt>
-                <dd>{{ formatDate(deal.expectedCloseDate) }}</dd>
+      <!-- Main content with tabs -->
+      <section class="flex-1 min-w-0">
+        <div class="rounded-lg border bg-card">
+          <!-- Tab bar -->
+          <div class="flex border-b border-border px-2">
+            @for (tab of ['Overview', 'Contact', 'Activities', 'History']; track tab) {
+              <button
+                type="button"
+                class="px-4 py-3 text-sm font-medium border-b-2 transition-colors -mb-px"
+                [class]="activeTab === tab ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+                (click)="activeTab = tab"
+              >{{ tab }}</button>
+            }
+          </div>
+
+          <div class="p-6">
+            <!-- Overview tab -->
+            @if (activeTab === 'Overview') {
+              <dl class="grid grid-cols-2 gap-4 text-sm">
+                <div><dt class="text-muted-foreground">Owner</dt><dd class="font-medium mt-0.5">{{ deal.owner }}</dd></div>
+                <div><dt class="text-muted-foreground">Priority</dt><dd class="font-medium mt-0.5 capitalize">{{ deal.priority }}</dd></div>
+                <div><dt class="text-muted-foreground">Expected close</dt><dd class="font-medium mt-0.5">{{ formatDate(deal.expectedCloseDate) }}</dd></div>
                 @if (deal.actualCloseDate) {
-                  <dt>Actual close</dt>
-                  <dd>{{ formatDate(deal.actualCloseDate) }}</dd>
+                  <div><dt class="text-muted-foreground">Actual close</dt><dd class="font-medium mt-0.5">{{ formatDate(deal.actualCloseDate) }}</dd></div>
                 }
-                <dt>Created</dt>
-                <dd>{{ formatDate(deal.createdAt) }}</dd>
+                <div><dt class="text-muted-foreground">Created</dt><dd class="font-medium mt-0.5">{{ formatDate(deal.createdAt) }}</dd></div>
               </dl>
               @if (deal.tags.length) {
-                <div class="deal-detail__tags">
+                <div class="flex flex-wrap gap-2 mt-4">
                   @for (tag of deal.tags; track tag) {
-                    <span class="deal-detail__tag">{{ tag }}</span>
+                    <span class="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium">{{ tag }}</span>
                   }
                 </div>
               }
               @if (deal.notes) {
-                <div class="deal-detail__notes">
-                  <h3>Notes</h3>
-                  <p>{{ deal.notes }}</p>
+                <div class="mt-4 pt-4 border-t border-border">
+                  <h3 class="text-sm font-medium mb-2">Notes</h3>
+                  <p class="text-sm text-muted-foreground">{{ deal.notes }}</p>
                 </div>
               }
-            </div>
-          </mat-tab>
+            }
 
-          <mat-tab label="Contact">
-            <div class="deal-detail__tab">
+            <!-- Contact tab -->
+            @if (activeTab === 'Contact') {
               @if (contact) {
-                <article class="deal-detail__contact-card">
+                <div class="flex items-start gap-4">
                   <app-avatar [name]="contact.firstName + ' ' + contact.lastName" [src]="contact.avatar" size="lg" />
-                  <div>
-                    <h3>{{ contact.firstName }} {{ contact.lastName }}</h3>
-                    <p>{{ contact.jobTitle }}</p>
-                    <p>{{ contact.companyName }}</p>
-                    <a [href]="'mailto:' + contact.email">{{ contact.email }}</a>
+                  <div class="flex flex-col gap-1">
+                    <h3 class="font-semibold">{{ contact.firstName }} {{ contact.lastName }}</h3>
+                    <p class="text-sm text-muted-foreground">{{ contact.jobTitle }}</p>
+                    <p class="text-sm text-muted-foreground">{{ contact.companyName }}</p>
+                    <a [href]="'mailto:' + contact.email" class="text-sm text-primary">{{ contact.email }}</a>
                   </div>
-                  <a mat-stroked-button [routerLink]="['/contacts', contact.id]">View contact</a>
-                </article>
+                  <a
+                    [routerLink]="['/contacts', contact.id]"
+                    class="ml-auto inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent no-underline"
+                  >View contact</a>
+                </div>
               } @else {
-                <p class="deal-detail__empty">Contact information unavailable.</p>
+                <p class="text-sm text-muted-foreground">Contact information unavailable.</p>
               }
-            </div>
-          </mat-tab>
+            }
 
-          <mat-tab label="Activities">
-            <div class="deal-detail__tab">
+            <!-- Activities tab -->
+            @if (activeTab === 'Activities') {
               @if (activities.length) {
-                <ul class="deal-detail__timeline">
+                <ul class="flex flex-col gap-4 list-none p-0 m-0">
                   @for (activity of activities; track activity.id) {
-                    <li class="deal-detail__timeline-item">
-                      <mat-icon>{{ activityIcon(activity.type) }}</mat-icon>
-                      <div>
-                        <strong>{{ activity.title }}</strong>
+                    <li class="flex items-start gap-3">
+                      <span class="material-icons-round text-xl text-muted-foreground mt-0.5 shrink-0">{{ activityIcon(activity.type) }}</span>
+                      <div class="flex flex-col gap-0.5">
+                        <strong class="text-sm font-medium">{{ activity.title }}</strong>
                         @if (activity.description) {
-                          <p>{{ activity.description }}</p>
+                          <p class="text-sm text-muted-foreground m-0">{{ activity.description }}</p>
                         }
-                        <time>{{ formatDate(activity.createdAt) }}</time>
+                        <time class="text-xs text-muted-foreground">{{ formatDate(activity.createdAt) }}</time>
                       </div>
                     </li>
                   }
                 </ul>
               } @else {
-                <p class="deal-detail__empty">No activities logged for this deal.</p>
+                <p class="text-sm text-muted-foreground">No activities logged for this deal.</p>
               }
-            </div>
-          </mat-tab>
+            }
 
-          <mat-tab label="History">
-            <div class="deal-detail__tab">
-              <ul class="deal-detail__history">
+            <!-- History tab -->
+            @if (activeTab === 'History') {
+              <ul class="flex flex-col gap-2 list-none p-0 m-0">
                 @for (entry of historyEntries; track entry.label) {
-                  <li>
+                  <li class="flex items-center justify-between text-sm py-2 border-b border-border last:border-0">
                     <span>{{ entry.label }}</span>
-                    <time>{{ formatDate(entry.date) }}</time>
+                    <time class="text-muted-foreground">{{ formatDate(entry.date) }}</time>
                   </li>
                 }
               </ul>
-            </div>
-          </mat-tab>
-        </mat-tab-group>
+            }
+          </div>
+        </div>
       </section>
     </div>
   </div>

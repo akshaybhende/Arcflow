@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
@@ -24,6 +24,10 @@ import {
 
 @Injectable()
 export class ContactsEffects {
+  private readonly actions$ = inject(Actions);
+  private readonly contactsService = inject(ContactsService);
+  private readonly notificationService = inject(NotificationService);
+
   loadContacts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadContacts),
@@ -124,15 +128,15 @@ export class ContactsEffects {
   mutationFailure$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(createContactFailure, updateContactFailure, deleteContactFailure, loadContactsFailure),
+        ofType(
+          createContactFailure,
+          updateContactFailure,
+          deleteContactFailure,
+          loadContactsFailure,
+          loadContactFailure,
+        ),
         tap(({ error }) => this.notificationService.error(error)),
       ),
     { dispatch: false },
   );
-
-  constructor(
-    private readonly actions$: Actions,
-    private readonly contactsService: ContactsService,
-    private readonly notificationService: NotificationService,
-  ) {}
 }

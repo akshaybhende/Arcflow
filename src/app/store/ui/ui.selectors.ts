@@ -8,6 +8,11 @@ export const selectSidebarCollapsed = createSelector(
   (state) => state.sidebarCollapsed,
 );
 
+export const selectMobileSidebarOpen = createSelector(
+  selectUiState,
+  (state) => state.mobileSidebarOpen,
+);
+
 export const selectTheme = createSelector(selectUiState, (state) => state.theme);
 
 export const selectGlobalLoading = createSelector(

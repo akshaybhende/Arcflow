@@ -1,132 +1,149 @@
 @if (company) {
-  <div class="company-detail">
-    <nav class="company-detail__breadcrumb">
-      <a routerLink="/companies">Companies</a>
-      <mat-icon>chevron_right</mat-icon>
-      <span>{{ company.name }}</span>
+  <div class="space-y-6">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-1 text-sm text-muted-foreground">
+      <a routerLink="/companies" class="hover:text-foreground no-underline">Companies</a>
+      <span class="material-icons-round text-base">chevron_right</span>
+      <span class="text-foreground font-medium">{{ company.name }}</span>
     </nav>
 
-    <div class="company-detail__layout">
-      <aside class="company-detail__sidebar">
-        <app-avatar [name]="company.name" [src]="company.logo" size="xl" shape="square" />
-        <h2>{{ company.name }}</h2>
-        <span class="company-detail__badge">{{ industryLabels[company.industry] }}</span>
-        <span class="company-detail__badge company-detail__badge--muted">{{ sizeLabels[company.size] }}</span>
+    <div class="flex gap-6 flex-col lg:flex-row">
+      <!-- Sidebar -->
+      <aside class="w-full lg:w-72 shrink-0">
+        <div class="rounded-lg border bg-card p-6 flex flex-col gap-4">
+          <div class="flex flex-col items-center gap-3 text-center">
+            <app-avatar [name]="company.name" [src]="company.logo" size="xl" shape="square" />
+            <h2 class="text-xl font-semibold">{{ company.name }}</h2>
+            <div class="flex flex-wrap gap-1 justify-center">
+              <span class="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium">{{ industryLabels[company.industry] }}</span>
+              <span class="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">{{ sizeLabels[company.size] }}</span>
+            </div>
+          </div>
 
-        <dl class="company-detail__info">
-          @if (company.website) {
-            <dt>Website</dt>
-            <dd><a [href]="company.website" target="_blank" rel="noopener">{{ company.website }}</a></dd>
-          }
-          @if (company.phone) {
-            <dt>Phone</dt>
-            <dd><a [href]="'tel:' + company.phone">{{ company.phone }}</a></dd>
-          }
-          @if (company.email) {
-            <dt>Email</dt>
-            <dd><a [href]="'mailto:' + company.email">{{ company.email }}</a></dd>
-          }
-          @if (formatAddress(company)) {
-            <dt>Address</dt>
-            <dd>{{ formatAddress(company) }}</dd>
-          }
-        </dl>
+          <dl class="flex flex-col gap-2 text-sm pt-2 border-t border-border">
+            @if (company.website) {
+              <div><dt class="text-muted-foreground text-xs">Website</dt><dd><a [href]="company.website" target="_blank" rel="noopener" class="text-primary text-xs truncate block">{{ company.website }}</a></dd></div>
+            }
+            @if (company.phone) {
+              <div><dt class="text-muted-foreground text-xs">Phone</dt><dd><a [href]="'tel:' + company.phone" class="text-xs">{{ company.phone }}</a></dd></div>
+            }
+            @if (company.email) {
+              <div><dt class="text-muted-foreground text-xs">Email</dt><dd><a [href]="'mailto:' + company.email" class="text-xs text-primary">{{ company.email }}</a></dd></div>
+            }
+            @if (formatAddress(company)) {
+              <div><dt class="text-muted-foreground text-xs">Address</dt><dd class="text-xs mt-0.5">{{ formatAddress(company) }}</dd></div>
+            }
+          </dl>
 
-        <div class="company-detail__actions">
-          <button mat-stroked-button type="button" (click)="navigateToEdit()">Edit</button>
-          <button mat-stroked-button color="warn" type="button" (click)="confirmDelete()">Delete</button>
+          <div class="flex gap-2 pt-2 border-t border-border">
+            <button
+              type="button"
+              class="flex-1 inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-accent transition-colors"
+              (click)="navigateToEdit()"
+            >Edit</button>
+            <ng-container *appHasRole="['admin', 'manager']">
+              <button
+                type="button"
+                class="flex-1 inline-flex items-center justify-center rounded-md border border-destructive text-destructive px-3 py-2 text-sm font-medium hover:bg-destructive/10 transition-colors"
+                (click)="confirmDelete()"
+              >Delete</button>
+            </ng-container>
+          </div>
         </div>
       </aside>
 
-      <section class="company-detail__main">
-        <mat-tab-group>
-          <mat-tab label="Overview">
-            <div class="company-detail__tab">
-              <dl class="company-detail__meta">
-                <dt>Revenue</dt>
-                <dd>{{ company.revenue ? (company.revenue | currencyFormat) : '—' }}</dd>
-                <dt>Owner</dt>
-                <dd>{{ company.owner }}</dd>
-                <dt>Domain</dt>
-                <dd>{{ company.domain || '—' }}</dd>
-                <dt>Created</dt>
-                <dd>{{ formatDate(company.createdAt) }}</dd>
+      <!-- Main content -->
+      <section class="flex-1 min-w-0">
+        <div class="rounded-lg border bg-card">
+          <div class="flex border-b border-border px-2">
+            @for (tab of ['Overview', 'Contacts', 'Deals', 'Activities']; track tab) {
+              <button
+                type="button"
+                class="px-4 py-3 text-sm font-medium border-b-2 transition-colors -mb-px"
+                [class]="activeTab === tab ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+                (click)="activeTab = tab"
+              >{{ tab }}</button>
+            }
+          </div>
+
+          <div class="p-6">
+            @if (activeTab === 'Overview') {
+              <dl class="grid grid-cols-2 gap-4 text-sm">
+                <div><dt class="text-muted-foreground">Revenue</dt><dd class="font-medium mt-0.5">{{ company.revenue ? (company.revenue | currencyFormat) : '—' }}</dd></div>
+                <div><dt class="text-muted-foreground">Owner</dt><dd class="font-medium mt-0.5">{{ company.owner }}</dd></div>
+                <div><dt class="text-muted-foreground">Domain</dt><dd class="font-medium mt-0.5">{{ company.domain || '—' }}</dd></div>
+                <div><dt class="text-muted-foreground">Created</dt><dd class="font-medium mt-0.5">{{ formatDate(company.createdAt) }}</dd></div>
               </dl>
               @if (company.notes) {
-                <div class="company-detail__notes">
-                  <h3>Notes</h3>
-                  <p>{{ company.notes }}</p>
+                <div class="mt-4 pt-4 border-t border-border">
+                  <h3 class="text-sm font-medium mb-2">Notes</h3>
+                  <p class="text-sm text-muted-foreground">{{ company.notes }}</p>
                 </div>
               }
-            </div>
-          </mat-tab>
+            }
 
-          <mat-tab label="Contacts">
-            <div class="company-detail__tab">
+            @if (activeTab === 'Contacts') {
               @if (contacts.length) {
-                <div class="company-detail__cards">
+                <div class="flex flex-col gap-3">
                   @for (contact of contacts; track contact.id) {
-                    <article class="company-detail__mini-card">
+                    <div class="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
                       <app-avatar [name]="contact.firstName + ' ' + contact.lastName" [src]="contact.avatar" />
-                      <div>
-                        <h4>{{ contact.firstName }} {{ contact.lastName }}</h4>
-                        <p>{{ contact.jobTitle }}</p>
-                        <p>{{ contact.email }}</p>
+                      <div class="flex-1 min-w-0">
+                        <h4 class="text-sm font-medium truncate">{{ contact.firstName }} {{ contact.lastName }}</h4>
+                        <p class="text-xs text-muted-foreground">{{ contact.jobTitle }}</p>
+                        <p class="text-xs text-muted-foreground">{{ contact.email }}</p>
                       </div>
-                      <a mat-stroked-button [routerLink]="['/contacts', contact.id]">View</a>
-                    </article>
+                      <a
+                        [routerLink]="['/contacts', contact.id]"
+                        class="inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent no-underline"
+                      >View</a>
+                    </div>
                   }
                 </div>
               } @else {
-                <p class="company-detail__empty">No contacts linked to this company.</p>
+                <p class="text-sm text-muted-foreground">No contacts linked to this company.</p>
               }
-            </div>
-          </mat-tab>
+            }
 
-          <mat-tab label="Deals">
-            <div class="company-detail__tab">
+            @if (activeTab === 'Deals') {
               @if (deals.length) {
-                <ul class="company-detail__deals">
+                <ul class="flex flex-col gap-2 list-none p-0 m-0">
                   @for (deal of deals; track deal.id) {
-                    <li>
-                      <a [routerLink]="['/deals', deal.id]">{{ deal.title }}</a>
-                      <span class="company-detail__deal-stage" [style.background-color]="stageColors[deal.stage]">
-                        {{ stageLabels[deal.stage] }}
-                      </span>
-                      <span>{{ deal.value | currencyFormat }}</span>
-                      <span class="company-detail__deal-date">{{ formatDate(deal.expectedCloseDate) }}</span>
+                    <li class="flex items-center gap-3 py-2 border-b border-border last:border-0 text-sm">
+                      <a [routerLink]="['/deals', deal.id]" class="font-medium flex-1 truncate">{{ deal.title }}</a>
+                      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-secondary">{{ stageLabels[deal.stage] }}</span>
+                      <span class="text-muted-foreground">{{ deal.value | currencyFormat }}</span>
+                      <time class="text-xs text-muted-foreground">{{ formatDate(deal.expectedCloseDate) }}</time>
                     </li>
                   }
                 </ul>
               } @else {
-                <p class="company-detail__empty">No deals linked to this company.</p>
+                <p class="text-sm text-muted-foreground">No deals linked to this company.</p>
               }
-            </div>
-          </mat-tab>
+            }
 
-          <mat-tab label="Activities">
-            <div class="company-detail__tab">
+            @if (activeTab === 'Activities') {
               @if (activities.length) {
-                <ul class="company-detail__timeline">
+                <ul class="flex flex-col gap-4 list-none p-0 m-0">
                   @for (activity of activities; track activity.id) {
-                    <li>
-                      <mat-icon>{{ activityIcon(activity.type) }}</mat-icon>
-                      <div>
-                        <strong>{{ activity.title }}</strong>
+                    <li class="flex items-start gap-3">
+                      <span class="material-icons-round text-xl text-muted-foreground mt-0.5 shrink-0">{{ activityIcon(activity.type) }}</span>
+                      <div class="flex flex-col gap-0.5">
+                        <strong class="text-sm font-medium">{{ activity.title }}</strong>
                         @if (activity.description) {
-                          <p>{{ activity.description }}</p>
+                          <p class="text-sm text-muted-foreground m-0">{{ activity.description }}</p>
                         }
-                        <time>{{ formatDate(activity.createdAt) }}</time>
+                        <time class="text-xs text-muted-foreground">{{ formatDate(activity.createdAt) }}</time>
                       </div>
                     </li>
                   }
                 </ul>
               } @else {
-                <p class="company-detail__empty">No activities for this company.</p>
+                <p class="text-sm text-muted-foreground">No activities for this company.</p>
               }
-            </div>
-          </mat-tab>
-        </mat-tab-group>
+            }
+          </div>
+        </div>
       </section>
     </div>
   </div>

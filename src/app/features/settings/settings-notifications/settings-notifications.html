@@ -1,40 +1,97 @@
-<section class="settings-section">
-  <h2 class="settings-section__title">Notifications</h2>
-  <p class="settings-section__desc">Choose which alerts you receive. Preferences are stored locally.</p>
+<section class="rounded-lg border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-6">
+  <div>
+    <h2 class="text-base font-semibold text-foreground">Notifications</h2>
+    <p class="text-sm text-muted-foreground mt-1">Choose which alerts you receive. Preferences are stored locally.</p>
+  </div>
 
-  <form [formGroup]="form" class="settings-section__form" (ngSubmit)="onSave()">
-    <div class="settings-notifications__toggle">
-      <div>
-        <span class="settings-notifications__toggle-label">Email notifications</span>
-        <span class="settings-section__hint">Receive updates via email</span>
+  <div class="h-px bg-border"></div>
+
+  <form [formGroup]="form" class="flex flex-col gap-1" (ngSubmit)="onSave()">
+    <!-- Email notifications -->
+    <label class="flex items-center justify-between gap-4 rounded-lg px-1 py-3 cursor-pointer hover:bg-muted/50 transition-colors">
+      <div class="flex flex-col gap-0.5">
+        <span class="text-sm font-medium text-foreground">Email notifications</span>
+        <span class="text-xs text-muted-foreground">Receive updates via email</span>
       </div>
-      <mat-slide-toggle formControlName="email"></mat-slide-toggle>
-    </div>
-
-    <div class="settings-notifications__toggle">
-      <div>
-        <span class="settings-notifications__toggle-label">In-app notifications</span>
-        <span class="settings-section__hint">Show alerts inside Arcflow</span>
+      <div class="relative flex-shrink-0">
+        <input
+          type="checkbox"
+          role="switch"
+          class="peer sr-only"
+          formControlName="email"
+        />
+        <div class="h-6 w-11 rounded-full border border-input bg-muted peer-checked:bg-primary transition-colors"></div>
+        <div class="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
       </div>
-      <mat-slide-toggle formControlName="inApp"></mat-slide-toggle>
-    </div>
+    </label>
 
-    <div class="settings-notifications__toggle">
-      <div>
-        <span class="settings-notifications__toggle-label">Deal reminders</span>
-        <span class="settings-section__hint">Reminders for upcoming close dates</span>
+    <div class="h-px bg-border mx-1"></div>
+
+    <!-- In-app notifications -->
+    <label class="flex items-center justify-between gap-4 rounded-lg px-1 py-3 cursor-pointer hover:bg-muted/50 transition-colors">
+      <div class="flex flex-col gap-0.5">
+        <span class="text-sm font-medium text-foreground">In-app notifications</span>
+        <span class="text-xs text-muted-foreground">Show alerts inside Arcflow</span>
       </div>
-      <mat-slide-toggle formControlName="dealReminders"></mat-slide-toggle>
-    </div>
-
-    <div class="settings-notifications__toggle">
-      <div>
-        <span class="settings-notifications__toggle-label">Activity reminders</span>
-        <span class="settings-section__hint">Reminders for pending tasks and calls</span>
+      <div class="relative flex-shrink-0">
+        <input
+          type="checkbox"
+          role="switch"
+          class="peer sr-only"
+          formControlName="inApp"
+        />
+        <div class="h-6 w-11 rounded-full border border-input bg-muted peer-checked:bg-primary transition-colors"></div>
+        <div class="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
       </div>
-      <mat-slide-toggle formControlName="activityReminders"></mat-slide-toggle>
-    </div>
+    </label>
 
-    <button mat-flat-button color="primary" type="submit">Save preferences</button>
+    <div class="h-px bg-border mx-1"></div>
+
+    <!-- Deal reminders -->
+    <label class="flex items-center justify-between gap-4 rounded-lg px-1 py-3 cursor-pointer hover:bg-muted/50 transition-colors">
+      <div class="flex flex-col gap-0.5">
+        <span class="text-sm font-medium text-foreground">Deal reminders</span>
+        <span class="text-xs text-muted-foreground">Reminders for upcoming close dates</span>
+      </div>
+      <div class="relative flex-shrink-0">
+        <input
+          type="checkbox"
+          role="switch"
+          class="peer sr-only"
+          formControlName="dealReminders"
+        />
+        <div class="h-6 w-11 rounded-full border border-input bg-muted peer-checked:bg-primary transition-colors"></div>
+        <div class="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
+      </div>
+    </label>
+
+    <div class="h-px bg-border mx-1"></div>
+
+    <!-- Activity reminders -->
+    <label class="flex items-center justify-between gap-4 rounded-lg px-1 py-3 cursor-pointer hover:bg-muted/50 transition-colors">
+      <div class="flex flex-col gap-0.5">
+        <span class="text-sm font-medium text-foreground">Activity reminders</span>
+        <span class="text-xs text-muted-foreground">Reminders for pending tasks and calls</span>
+      </div>
+      <div class="relative flex-shrink-0">
+        <input
+          type="checkbox"
+          role="switch"
+          class="peer sr-only"
+          formControlName="activityReminders"
+        />
+        <div class="h-6 w-11 rounded-full border border-input bg-muted peer-checked:bg-primary transition-colors"></div>
+        <div class="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
+      </div>
+    </label>
+
+    <div class="h-px bg-border mt-2 mb-4"></div>
+
+    <div>
+      <button
+        type="submit"
+        class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+      >Save preferences</button>
+    </div>
   </form>
 </section>
